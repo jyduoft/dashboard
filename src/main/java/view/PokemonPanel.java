@@ -5,12 +5,12 @@ import java.awt.*;
 
 public class PokemonPanel extends JPanel {
 
-    private final Image pokemon;
+    private final ImageIcon icon;
     private int x = 0;
     private int dx = 3;
 
-    public PokemonPanel(Image pokemon) {
-        this.pokemon = pokemon;
+    public PokemonPanel(ImageIcon icon) {
+        this.icon = icon;
 
         Timer timer = new Timer(30, e -> {
             move();
@@ -23,8 +23,7 @@ public class PokemonPanel extends JPanel {
 
     private void move() {
         int width = getWidth();
-        int imgWidth = pokemon.getWidth(this);
-        if (imgWidth <= 0) imgWidth = 40;
+        int imgWidth = icon.getIconWidth();
 
         x += dx;
         if (x < 0) {
@@ -39,10 +38,11 @@ public class PokemonPanel extends JPanel {
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
-        int imgHeight = pokemon.getHeight(this);
-        if (imgHeight <= 0) imgHeight = 40;
 
+        int imgHeight = icon.getIconHeight();
         int y = (getHeight() - imgHeight) / 2;
-        g.drawImage(pokemon, x, y, imgHeight, imgHeight, this);
+
+        // IMPORTANT: this animates GIFs properly
+        g.drawImage(icon.getImage(), x, y, this);
     }
 }
