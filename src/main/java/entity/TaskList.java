@@ -20,9 +20,9 @@ public class TaskList {
 
     /**
      * Returns tasks sorted by:
-     *  1. pinned index (priorityOverride) if !=-1
-     *  2. otherwise by category priority
-     *  3. then due date (earlier first)
+     * 1. pinned index (priorityOverride) if !=-1
+     * 2. otherwise by category priority
+     * 3. then due date (earlier first)
      */
     public List<Task> getTasksSorted() {
         List<Task> pinned = new ArrayList<>();
@@ -69,21 +69,32 @@ public class TaskList {
 
     private Comparator<Task> defaultComparator() {
         return (t1, t2) -> {
-            // 1) category priority: higher first
+            // 1) Category priority: higher first
             int p1 = t1.getCategory().getPriority();
             int p2 = t2.getCategory().getPriority();
-            int cmp = Integer.compare(p2, p1);
+            int cmp = Integer.compare(p2, p1); // descending
             if (cmp != 0) return cmp;
 
-            // 2) due date: earlier first, nulls last
+            // 2) Due date: earlier first, nulls last
             LocalDateTime d1 = t1.getDueDate();
             LocalDateTime d2 = t2.getDueDate();
 
-            if (d1 == null && d2 == null) return 0;
-            if (d1 == null) return 1;
-            if (d2 == null) return -1;
+            if (d1 == null && d2 != null) return 1;   // nulls last
+            if (d1 != null && d2 == null) return -1;
+            if (d1 != null && d2 != null) {
+                cmp = d1.compareTo(d2);
+                if (cmp != 0) return cmp;
+            }
+            // If both null, or equal date, fall through to step 3
 
-            return d1.compareTo(d2);
+            // 3) Alphabetical by task name (case-insensitive)
+            String n1 = t1.getTaskName();
+            String n2 = t2.getTaskName();
+            if (n1 == null && n2 == null) return 0;
+            if (n1 == null) return 1;
+            if (n2 == null) return -1;
+
+            return n1.compareToIgnoreCase(n2);
         };
     }
 }

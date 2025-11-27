@@ -7,71 +7,144 @@ import java.util.Objects;
 
 public class Task {
 
-    private final String id;
+    private final String id;                      // stable identity
     private String taskName;
     private Category category;
     private LocalDateTime dueDate;
-    private final ArrayList<LocalDateTime> remindDates;
-    private int priorityOverride;
+    private final List<LocalDateTime> remindDates;
+    private int priorityOverride;                // -1 = no pin, >=0 = pinned index
     private boolean isComplete;
 
-    public Task(String id, String taskName) {
+    private Task(String id, String taskName) {
+        if (id == null || id.isBlank()) {
+            throw new IllegalArgumentException("Task id cannot be null or blank");
+        }
+        if (taskName == null || taskName.isBlank()) {
+            throw new IllegalArgumentException("Task name cannot be null or blank");
+        }
         this.id = id;
         this.taskName = taskName;
         this.category = Category.UNSORTED;
-        this.dueDate = null;
-        this.remindDates = new ArrayList<LocalDateTime>();
+        this.remindDates = new ArrayList<>();
         this.priorityOverride = -1;
         this.isComplete = false;
+    }
+    private Task(String id, String taskName, Category category) {
+        this(id, taskName);
+        setCategory(category);
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public String getTaskName() {
+        return taskName;
+    }
+
+    public void setTaskName(String taskName) {
+        if (taskName == null || taskName.isBlank()) {
+            throw new IllegalArgumentException("Task name cannot be null or blank");
+        }
+        this.taskName = taskName;
+    }
+
+    public Category getCategory() {
+        return category;
+    }
+
+    public void setCategory(Category category) {
+        if (this.category != null) {
+            this.category = category;
+        }
+        else {
+            this.category = Category.UNSORTED;
+        }
+    }
+
+    public LocalDateTime getDueDate() {
+        return dueDate;
+    }
+
+    public void setDueDate(LocalDateTime dueDate) {
+        this.dueDate = dueDate;
+    }
+
+    public List<LocalDateTime> getRemindDates() {
+        return new ArrayList<>(remindDates);
+    }
+
+    public void addRemindDate(LocalDateTime dateTime) {
+        if (dateTime != null) {
+            remindDates.add(dateTime);
+        }
+    }
+
+    public void removeRemindDate(LocalDateTime dateTime) {
+        remindDates.remove(dateTime);
+    }
+
+    public int getPriorityOverride() {
+        return priorityOverride;
+    }
+
+    /**
+     * -1 = no pin; >=0 = index in the master list to pin to.
+     */
+    public void setPriorityOverride(int priorityOverride) {
+        this.priorityOverride = priorityOverride;
+    }
+
+    public boolean isComplete() {
+        return isComplete;
+    }
+
+    public void setComplete(boolean complete) {
+        isComplete = complete;
+    }
+
+    public void toggleComplete() {
+        isComplete = !isComplete;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Task)) return false;
+        Task task = (Task) o;
+        return Objects.equals(id, task.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 
     @Override
     public String toString() {
         return "Task{" +
                 "id='" + id + '\'' +
-                ", name=" + taskName +
+                ", taskName='" + taskName + '\'' +
+                ", category=" + category +
+                ", dueDate=" + dueDate +
+                ", priorityOverride=" + priorityOverride +
+                ", isComplete=" + isComplete +
                 '}';
     }
 
-    public String getId() {return id;}
-
-    public String getTaskName() {return taskName;}
-    public void setTaskName(String taskName) {this.taskName = taskName;}
-
-    public Category getCategory() {return this.category;}
-    public void setCategory(Category category) {
-        this.category = Objects.requireNonNullElse(category, Category.UNSORTED);
-    }
-
-    public LocalDateTime getDueDate() {return this.dueDate;}
-    public void setDueDate(LocalDateTime dueDate) {this.dueDate = dueDate;}
-
-    public ArrayList<LocalDateTime> getRemindDates() {return this.remindDates;}
-    public void addRemindDate(LocalDateTime remindDate) {this.remindDates.add(remindDate);}
-    public void removeRemindDate(LocalDateTime remindDate) {this.remindDates.remove(remindDate);}
-
-    public int getPriorityOverride() {return this.priorityOverride;}
-    public void setPriorityOverride(int priorityOverride) {this.priorityOverride = priorityOverride;}
-
-    public boolean isComplete() {return this.isComplete;}
-    public void setComplete(boolean isComplete) {this.isComplete = isComplete;}
-
-//    public void setRemindDates(List<LocalDateTime> reminders) {
-//    }
-//
-//    public void setNotificationSent(boolean b) {
-//    }
-//
-//    public Object getTitle() {
-//    }
-
     public static class TaskFactory {
-        private static long nextId = 0;
+        private static long nextId = 1;
 
         public static Task createTask(String taskName) {
-            String id = "task-" + (++nextId);
+            String id = "task-" + nextId;
+            nextId++;
             return new Task(id, taskName);
         }
-    }
 
+        public static Task createTask(String taskName, Category category) {
+            String id = "task-" + nextId;
+            nextId++;
+            return new Task(id, taskName, category);
+        }
+    }
 }
