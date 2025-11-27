@@ -25,6 +25,8 @@ import use_cases.*;
 import view.MainDashboardView;
 import view.PokemonPanel;
 import data_access.PokemonDataAccessObject;
+import view.StockPanel;
+import data_access.StockDataAccessObject;
 
 import javax.swing.*;
 import java.awt.*;
@@ -127,8 +129,12 @@ public class Main {
 
             taskPanel.add(taskRow);
 
-            JPanel stockPanel = new JPanel();
-            stockPanel.add(new JLabel("Stocks panel"));
+//--------------------------------
+// Small APP Panel
+// -------------------------------
+
+            StockDataAccessObject stockDAO = new StockDataAccessObject();
+            StockPanel stockPanel = new StockPanel(stockDAO);
 
             JPanel weatherPanel = new JPanel();
             weatherPanel.add(new JLabel("Weather panel"));
@@ -139,7 +145,6 @@ public class Main {
 //--------------------------------
 // Pokémon Panel
 // -------------------------------
-
             User user = new User("tony", "123456");
             UserDataAccessObject userDAO = new UserDataAccessObject();
             PokemonDataAccessObject pokemonDAO = new PokemonDataAccessObject();

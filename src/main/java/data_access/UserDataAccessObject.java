@@ -56,4 +56,7 @@ public class UserDataAccessObject {
 
         return new JSONObject(json);
     }
+
+    // make a new method that lets user log in with password and check the user pass word and see if its right
 }
+// make password hasher to mess up the password and unscramble it in thiss progarm.
