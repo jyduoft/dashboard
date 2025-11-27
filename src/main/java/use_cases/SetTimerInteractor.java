@@ -15,27 +15,28 @@ public class SetTimerInteractor implements SetTimerInputBoundary {
     }
 
     @Override
-    public void execute(SetTimerInputData inputData) {
-        Task task = dataAccess.getTask(inputData.getTaskTitle());
+    public void execute(String taskTitle, long dueMinutes, long warnMinutes) {
+        Task task = dataAccess.getTask(taskTitle);
         if (task == null) {
-            presenter.prepareFailView("Task not found.");
+            presenter.prepareFailView("Task not found: " + taskTitle);
             return;
         }
 
+        // Calculate Times
         LocalDateTime now = LocalDateTime.now();
-        LocalDateTime due = now.plusMinutes(inputData.getDueInMinutes());
-        LocalDateTime remind = due.minusMinutes(inputData.getWarnInMinutes());
+        LocalDateTime due = now.plusMinutes(dueMinutes);
+        LocalDateTime remind = due.minusMinutes(warnMinutes);
 
+        // Update Entity
         task.setDueDate(due);
         List<LocalDateTime> reminders = new ArrayList<>();
         reminders.add(remind);
         task.setRemindDates(reminders);
 
-        task.setNotificationSent(false);
+        task.setNotificationSent(false); // Reset notification status
 
+        // Save
         dataAccess.saveTask(task);
-
-        SetTimerOutputData output = new SetTimerOutputData("Timer set for: " + task.getTitle());
-        presenter.prepareSuccessView(output);
+        presenter.prepareSuccessView("Timer set for: " + taskTitle);
     }
 }

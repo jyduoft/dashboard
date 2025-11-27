@@ -1,5 +1,5 @@
 package use_cases;
 
 public interface SetTimerInputBoundary {
-    void execute(SetTimerInputData inputData);
+    void execute(String taskTitle, long dueMinutes, long warnMinutes);
 }
