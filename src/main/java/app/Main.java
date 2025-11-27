@@ -1,5 +1,6 @@
 package app;
 
+import data_access.UserDataAccessObject;
 import entity.DashboardConfig;
 import entity.Task;
 import interface_adapter.ConfigureDashboardController;
@@ -14,8 +15,16 @@ import use_cases.ConfigureDashboardInputBoundary;
 import use_cases.ConfigureDashboardInteractor;
 import use_cases.ConfigureDashboardOutputBoundary;
 import use_cases.DashboardConfigDataAccessInterface;
+import entity.User;
+import entity.Pokemon;
+import interface_adapter.ConfigureDashboardController;
+import interface_adapter.ConfigureDashboardPresenter;
+import interface_adapter.DashboardViewModel;
+import org.json.JSONObject;
+import use_cases.*;
 import view.MainDashboardView;
 import view.PokemonPanel;
+import data_access.PokemonDataAccessObject;
 
 import javax.swing.*;
 import java.awt.*;
@@ -127,16 +136,70 @@ public class Main {
             JPanel mapPanel = new JPanel();
             mapPanel.add(new JLabel("Map panel"));
 
-            // -------------------------------
-            // Pokemen Panels
-            // Here I put a simple circle here, change it with pokemen api,
-            // and also adjust parameters
-            // -------------------------------
-            BufferedImage img = new BufferedImage(40, 40, BufferedImage.TYPE_INT_ARGB);
-            Graphics2D g2 = img.createGraphics();
-            g2.fillOval(5, 5, 30, 30);
-            g2.dispose();
-            PokemonPanel pokemonPanel = new PokemonPanel(img);
+//--------------------------------
+// Pokémon Panel
+// -------------------------------
+
+            User user = new User("tony", "123456");
+            UserDataAccessObject userDAO = new UserDataAccessObject();
+            PokemonDataAccessObject pokemonDAO = new PokemonDataAccessObject();
+
+            //load or create Firebase user
+            JSONObject userJson;
+            try {
+                userJson = userDAO.loadUser(user);     // user exists → load data
+                System.out.println("Loaded existing Firebase user.");
+            } catch (Exception e) {
+                System.out.println("User does not exist. Creating new Firebase user...");
+                try {
+                    userDAO.createUser(user);          // create user
+                    userJson = userDAO.loadUser(user); // reload
+                } catch (Exception ex) {
+                    throw new RuntimeException("Failed to create user: " + ex.getMessage());
+                }
+            }
+
+            //create PokémonManager using loaded JSON
+            PokemonManager pokemonManager = null;
+            try {
+                pokemonManager = new PokemonManager(user);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+
+            //ensure user has a current Pokémon
+            if (pokemonManager.getUserInv().isEmpty() || pokemonManager.getCurrentPokemon() == null) {
+
+                Pokemon charmander = new Pokemon(
+                        "Charmander",
+                        "src/main/resources/cache/pokemon/4.gif",
+                        4,
+                        1,
+                        0,
+                        100,
+                        100
+                );
+
+                pokemonManager.getUserInv().add(charmander);
+                pokemonManager.setCurrentPokemon(charmander);
+
+                // Save back to Firebase
+                try {
+                    pokemonDAO.saveUserData(user, pokemonManager);
+                } catch (Exception ex) {
+                    System.out.println("Error saving default Pokémon: " + ex.getMessage());
+                }
+            }
+
+            //download missing sprite GIFs
+            pokemonDAO.fetchPokemonSprites(pokemonManager.getUserInv());
+
+            //load the GIF from local cache
+            String imgPath = pokemonManager.getCurrentPokemon().getImgFilePath();
+            ImageIcon gifIcon = new ImageIcon(imgPath);
+
+            //build Pokémon panel
+            PokemonPanel pokemonPanel = new PokemonPanel(gifIcon);
 
 
             // -------------------------------
