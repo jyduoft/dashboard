@@ -7,13 +7,14 @@ import java.util.Objects;
 
 public class Task {
 
-    private final String id;                      // stable identity
+    private final String id;
     private String taskName;
     private Category category;
     private LocalDateTime dueDate;
     private final List<LocalDateTime> remindDates;
-    private int priorityOverride;                // -1 = no pin, >=0 = pinned index
+    private int priorityOverride; // -1 = no pin, >=0 = pinned index
     private boolean isComplete;
+    private LocalDateTime completedAt;
 
     private Task(String id, String taskName) {
         if (id == null || id.isBlank()) {
@@ -54,12 +55,7 @@ public class Task {
     }
 
     public void setCategory(Category category) {
-        if (this.category != null) {
-            this.category = category;
-        }
-        else {
-            this.category = Category.UNSORTED;
-        }
+        this.category = Objects.requireNonNullElse(category, Category.UNSORTED);
     }
 
     public LocalDateTime getDueDate() {
@@ -84,13 +80,24 @@ public class Task {
         remindDates.remove(dateTime);
     }
 
+    public void addRemindDates(List<LocalDateTime> dateTimes) {
+        if (dateTimes == null) return;
+
+        for (LocalDateTime dt : dateTimes) {
+            if (dt != null) {
+                if (dt.isBefore(LocalDateTime.now())) {
+                    throw new IllegalArgumentException("Reminder cannot be in the past.");
+                }
+                remindDates.add(dt);
+            }
+        }
+    }
+
+
     public int getPriorityOverride() {
         return priorityOverride;
     }
 
-    /**
-     * -1 = no pin; >=0 = index in the master list to pin to.
-     */
     public void setPriorityOverride(int priorityOverride) {
         this.priorityOverride = priorityOverride;
     }
@@ -99,8 +106,17 @@ public class Task {
         return isComplete;
     }
 
+    public LocalDateTime getCompletedAt() {
+        return completedAt;
+    }
+
     public void setComplete(boolean complete) {
         isComplete = complete;
+        if (complete) {
+            this.completedAt = LocalDateTime.now();
+        } else {
+            this.completedAt = null;
+        }
     }
 
     public void toggleComplete() {
