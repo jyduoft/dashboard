@@ -2,7 +2,6 @@ package use_cases;
 
 import entity.Task;
 import javax.swing.*;
-import java.awt.*;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.concurrent.Executors;
@@ -16,16 +15,30 @@ public class TimerService {
             LocalDateTime now = LocalDateTime.now();
             for (Task task : tasks) {
                 // Alt Flow: Task complete -> No notification [cite: 49]
-                if (task.isCompleted()) continue;
+                if (task.isComplete()) continue;
 
-                if (task.getRemindDates() != null && !task.getRemindDates().isEmpty()) {
-                    LocalDateTime remindTime = task.getRemindDates().get(0);
+                List<Task.Reminder> reminders = task.getReminders();
+                if (reminders == null || reminders.isEmpty()) {
+                    continue;
+                }
 
-                    if (now.isAfter(remindTime) && !task.isNotificationSent()) {
+                for (Task.Reminder reminder : reminders) {
+                    // Only care about unsent reminders whose time has passed
+                    if (!reminder.isNotificationSent()
+                            && (now.isAfter(reminder.getTime()) || now.isEqual(reminder.getTime()))) {
+
                         SwingUtilities.invokeLater(() ->
-                                JOptionPane.showMessageDialog(null, "⏰ Due soon: " + task.getTitle())
+                                JOptionPane.showMessageDialog(
+                                        null,
+                                        "⏰ Due soon: " + task.getTaskName()
+                                )
                         );
-                        task.setNotificationSent(true);
+
+                        // mark this reminder as sent so we don't spam
+                        reminder.markSent();
+
+                        // break if you only want one popup per task per tick
+                        break;
                     }
                 }
             }

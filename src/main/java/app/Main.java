@@ -71,22 +71,22 @@ public class Main {
 
             viewModel.setConfig(gateway.load());
             List<Task> allTasks = new ArrayList<>();
-            allTasks.add(new Task("Finish Homework")); // Dummy Data
-            allTasks.add(new Task("Email Professor"));
+            allTasks.add(Task.TaskFactory.createTask("Finish Homework")); // Dummy Data
+            allTasks.add(Task.TaskFactory.createTask("Email Professor"));
 
             TaskDataAccessInterface taskDAO = new TaskDataAccessInterface() {
                 @Override
                 public Task getTask(String title) {
                     // Simple search logic for our list
                     for (Task t : allTasks) {
-                        if (t.getTitle().equals(title)) return t;
+                        if (t.getTaskName().equals(title)) return t;
                     }
                     return null;
                 }
 
                 @Override
                 public void saveTask(Task task) {
-                    System.out.println("Task saved: " + task.getTitle());
+                    System.out.println("Task saved: " + task.getTaskName());
                 }
             };
 

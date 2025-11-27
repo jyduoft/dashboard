@@ -11,10 +11,11 @@ public class Task {
     private String taskName;
     private Category category;
     private LocalDateTime dueDate;
-    private final List<LocalDateTime> remindDates;
+    private final List<Reminder> reminders;
     private int priorityOverride; // -1 = no pin, >=0 = pinned index
     private boolean isComplete;
     private LocalDateTime completedAt;
+    private boolean notificationSent;
 
     private Task(String id, String taskName) {
         if (id == null || id.isBlank()) {
@@ -26,7 +27,7 @@ public class Task {
         this.id = id;
         this.taskName = taskName;
         this.category = Category.UNSORTED;
-        this.remindDates = new ArrayList<>();
+        this.reminders = new ArrayList<>();
         this.priorityOverride = -1;
         this.isComplete = false;
     }
@@ -66,33 +67,40 @@ public class Task {
         this.dueDate = dueDate;
     }
 
-    public List<LocalDateTime> getRemindDates() {
-        return new ArrayList<>(remindDates);
+    public List<Reminder> getReminders() {
+        return new ArrayList<>(reminders);
     }
 
-    public void addRemindDate(LocalDateTime dateTime) {
-        if (dateTime != null) {
-            remindDates.add(dateTime);
+    public void addReminder(LocalDateTime time) {
+        if (time != null) {
+            reminders.add(new Reminder(time));
         }
     }
 
-    public void removeRemindDate(LocalDateTime dateTime) {
-        remindDates.remove(dateTime);
+    public void removeReminder(LocalDateTime time) {
+        if (time == null) return;
+        reminders.removeIf(r -> r.getTime().equals(time));
     }
 
-    public void addRemindDates(List<LocalDateTime> dateTimes) {
-        if (dateTimes == null) return;
+    public void addReminders(List<LocalDateTime> times) {
+        if (times == null) return;
 
-        for (LocalDateTime dt : dateTimes) {
-            if (dt != null) {
-                if (dt.isBefore(LocalDateTime.now())) {
-                    throw new IllegalArgumentException("Reminder cannot be in the past.");
-                }
-                remindDates.add(dt);
+        for (LocalDateTime time : times) {
+            if (time != null) {
+                reminders.add(new Reminder(time));
             }
         }
     }
 
+
+    public void markReminderSent(LocalDateTime time) {
+        for (Reminder r : reminders) {
+            if (r.getTime().equals(time)) {
+                r.markSent();
+                break;
+            }
+        }
+    }
 
     public int getPriorityOverride() {
         return priorityOverride;
@@ -148,6 +156,10 @@ public class Task {
                 '}';
     }
 
+    public void setNotificationSent(boolean b) { // not entirely sure what this is for. leaving it here for now
+        notificationSent = b;
+    }
+
     public static class TaskFactory {
         private static long nextId = 1;
 
@@ -161,6 +173,31 @@ public class Task {
             String id = "task-" + nextId;
             nextId++;
             return new Task(id, taskName, category);
+        }
+    }
+
+    public static class Reminder {
+        private final LocalDateTime time;
+        private boolean isNotificationSent;
+
+        public Reminder(LocalDateTime time) {
+            if (time == null) {
+                throw new IllegalArgumentException("Reminder time cannot be null");
+            }
+            this.time = time;
+            this.isNotificationSent = false;
+        }
+
+        public LocalDateTime getTime() {
+            return time;
+        }
+
+        public boolean isNotificationSent() {
+            return isNotificationSent;
+        }
+
+        public void markSent() {
+            this.isNotificationSent = true;
         }
     }
 }
