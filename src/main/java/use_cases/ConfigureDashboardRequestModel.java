@@ -1,6 +1,6 @@
 package use_cases;
 
-public class ConfigureDashboardRequestModel {
+public class    ConfigureDashboardRequestModel {
     private final boolean showTasks;
     private final boolean showStocks;
     private final boolean showWeather;

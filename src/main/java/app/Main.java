@@ -28,6 +28,17 @@ import data_access.PokemonDataAccessObject;
 import view.StockPanel;
 import data_access.StockDataAccessObject;
 
+import data_access.InMemoryTaskListDataAccessObject;
+import interface_adapter.TaskListController;
+import interface_adapter.TaskListPresenter;
+import interface_adapter.TaskListViewModel;
+import use_cases.TaskListDataAccessInterface;
+import use_cases.TaskListInputBoundary;
+import use_cases.TaskListOutputBoundary;
+import use_cases.TaskListInteractor;
+import view.TaskListView;
+
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -73,22 +84,22 @@ public class Main {
 
             viewModel.setConfig(gateway.load());
             List<Task> allTasks = new ArrayList<>();
-            allTasks.add(new Task("Finish Homework")); // Dummy Data
-            allTasks.add(new Task("Email Professor"));
+            allTasks.add(Task.TaskFactory.createTask("Finish Homework")); // Dummy Data
+            allTasks.add(Task.TaskFactory.createTask("Email Professor"));
 
             TaskDataAccessInterface taskDAO = new TaskDataAccessInterface() {
                 @Override
                 public Task getTask(String title) {
                     // Simple search logic for our list
                     for (Task t : allTasks) {
-                        if (t.getTitle().equals(title)) return t;
+                        if (t.getTaskName().equals(title)) return t;
                     }
                     return null;
                 }
 
                 @Override
                 public void saveTask(Task task) {
-                    System.out.println("Task saved: " + task.getTitle());
+                    System.out.println("Task saved: " + task.getTaskName());
                 }
             };
 
@@ -104,30 +115,44 @@ public class Main {
             // I just write a string here as example, we could substitute it
             // with each functional implementation
             // -------------------------------
-            JPanel taskPanel = new JPanel();
-            taskPanel.setLayout(new BoxLayout(taskPanel, BoxLayout.Y_AXIS));
-            taskPanel.add(new JLabel("My To-Do List:"));
-            JPanel taskRow = new JPanel(new FlowLayout(FlowLayout.LEFT));
-            taskRow.setMaximumSize(new Dimension(Integer.MAX_VALUE, 40));
-            JLabel taskName = new JLabel("Finish Homework");
-            taskRow.add(taskName);
-            JButton timerButton = new JButton("⏱️");
-            timerButton.setToolTipText("Set Timer");
-            timerButton.addActionListener(e -> {
-                String input = JOptionPane.showInputDialog(taskPanel, "Set timer (minutes):");
-                if (input != null && !input.isEmpty()) {
-                    try {
-                        long mins = Long.parseLong(input);
-                        timerController.execute("Finish Homework", mins, 0);
-                    } catch (NumberFormatException ex) {
-                        JOptionPane.showMessageDialog(taskPanel, "Please enter a valid number.");
-                    }
-                }
-            });
+//            JPanel taskPanel = new JPanel();
+//            taskPanel.setLayout(new BoxLayout(taskPanel, BoxLayout.Y_AXIS));
+//            taskPanel.add(new JLabel("My To-Do List:"));
+//            JPanel taskRow = new JPanel(new FlowLayout(FlowLayout.LEFT));
+//            taskRow.setMaximumSize(new Dimension(Integer.MAX_VALUE, 40));
+//            JLabel taskName = new JLabel("Finish Homework");
+//            taskRow.add(taskName);
+//            JButton timerButton = new JButton("⏱️");
+//            timerButton.setToolTipText("Set Timer");
+//            timerButton.addActionListener(e -> {
+//                String input = JOptionPane.showInputDialog(taskPanel, "Set timer (minutes):");
+//                if (input != null && !input.isEmpty()) {
+//                    try {
+//                        long mins = Long.parseLong(input);
+//                        timerController.execute("Finish Homework", mins, 0);
+//                    } catch (NumberFormatException ex) {
+//                        JOptionPane.showMessageDialog(taskPanel, "Please enter a valid number.");
+//                    }
+//                }
+//            });
+//
+//            taskRow.add(timerButton);
+//
+//            taskPanel.add(taskRow);
 
-            taskRow.add(timerButton);
+            // IMPORTANT TODO: Replace with Firebase
+            TaskListDataAccessInterface taskListDAO = new InMemoryTaskListDataAccessObject();
 
-            taskPanel.add(taskRow);
+            TaskListViewModel taskListViewModel = new TaskListViewModel();
+            TaskListOutputBoundary taskListPresenter = new TaskListPresenter(taskListViewModel);
+
+            TaskListInputBoundary taskListInteractor =
+                    new TaskListInteractor(taskListDAO, taskListPresenter);
+            TaskListController taskListController =
+                    new TaskListController(taskListInteractor);
+
+            JPanel taskPanel = new TaskListView(taskListController, taskListViewModel, timerController);
+            // -------------------------------
 
 //--------------------------------
 // Small APP Panel
