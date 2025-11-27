@@ -52,6 +52,11 @@ public class MainDashboardView extends JPanel implements PropertyChangeListener 
 
         viewModel.addPropertyChangeListener(this);
 
+        DashboardConfig current = viewModel.getConfig();
+        if (current != null) {
+            refreshLayout(current);
+        }
+
         configButton.addActionListener(e -> {
             new DashboardConfigDialog(SwingUtilities.getWindowAncestor(this),
                     viewModel, controller).setVisible(true);
