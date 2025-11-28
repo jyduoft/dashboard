@@ -17,7 +17,7 @@ public class TimerService {
             LocalDateTime now = LocalDateTime.now();
             for (Task task : tasks) {
                 // Skip completed tasks [cite: 49]
-                if (task.isComplete()) continue;
+                if (task.isCompleted()) continue;
 
                 List<Task.Reminder> reminders = task.getReminders();
                 if (reminders == null || reminders.isEmpty()) {
@@ -29,19 +29,18 @@ public class TimerService {
                     if (!reminder.isNotificationSent()
                             && (now.isAfter(reminder.getTime()) || now.isEqual(reminder.getTime()))) {
 
-                        // Trigger notification if time is up and not sent yet
-                        if (now.isAfter(reminder.getTime()) && !reminder.isNotificationSent()) {
-                            SwingUtilities.invokeLater(() ->
-                                    JOptionPane.showMessageDialog(null,
-                                            "⏰ REMINDER: " + task.getTaskName() + " is due soon!")
-                            );
+                    // Trigger notification if time is up and not sent yet
+                    if (now.isAfter(remindTime) && !task.isNotificationSent()) {
+                        SwingUtilities.invokeLater(() ->
+                                JOptionPane.showMessageDialog(null,
+                                        "⏰ REMINDER: " + task.getTitle() + " is due soon!")
+                        );
 
-                            // mark this reminder as sent so we don't spam
-                            reminder.markSent();
+                        // mark this reminder as sent so we don't spam
+                        reminder.markSent();
 
-                            // break if you only want one popup per task per tick
-                            break;
-                        }
+                        // break if you only want one popup per task per tick
+                        break;
                     }
                 }
             }

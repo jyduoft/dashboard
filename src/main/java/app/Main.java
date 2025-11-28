@@ -114,14 +114,14 @@ public class Main {
 //             allTasks.add(Task.TaskFactory.createTask("Email Professor"));
 
             List<Task> allTasks = new ArrayList<>();
-            allTasks.add(Task.TaskFactory.createTask("Finish Project"));
+            allTasks.add(new Task("Finish Project"));
             TaskDataAccessInterface taskDAO = new TaskDataAccessInterface() {
                 @Override public Task getTask(String title) {
-                    for (Task t : allTasks) if (t.getTaskName().equals(title)) return t;
+                    for (Task t : allTasks) if (t.getTitle().equals(title)) return t;
                     return null;
                 }
                 @Override public void saveTask(Task task) {
-                    System.out.println("Timer saved for: " + task.getTaskName());
+                    System.out.println("Timer saved for: " + task.getTitle());
                 }
             };
 

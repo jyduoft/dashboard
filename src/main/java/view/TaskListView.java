@@ -199,43 +199,43 @@ public class TaskListView extends JPanel implements PropertyChangeListener {
     /**
      * FOR TESTING ONLY IGNORE!!! Generated with gpt
      */
-//    public static void main(String[] args) {
-//
-//        // ---- 1. Create a fake DAO with some demo tasks ----
-//        use_cases.TaskListDataAccessInterface dao = new data_access.InMemoryTaskListDataAccessObject();
-//
-//        entity.Task t1 = entity.Task.TaskFactory.createTask("Test Task A");
-//        entity.Task t2 = entity.Task.TaskFactory.createTask("Test Task B");
-//        dao.saveAllTasks(java.util.Arrays.asList(t1, t2));
-//
-//        // ---- 2. Build view model + presenter ----
-//        interface_adapter.TaskListViewModel viewModel = new interface_adapter.TaskListViewModel();
-//        use_cases.TaskListOutputBoundary presenter =
-//                new interface_adapter.TaskListPresenter(viewModel);
-//
-//        // ---- 3. Build interactor + controller ----
-//        use_cases.TaskListInputBoundary interactor =
-//                new use_cases.TaskListInteractor(dao, presenter);
-//
-//        interface_adapter.TaskListController taskController =
-//                new interface_adapter.TaskListController(interactor);
-//
-//        // ---- 4. Dummy SetTimerController (so timer button won't crash) ----
-//        interface_adapter.SetTimerController dummyTimerController =
-//                new interface_adapter.SetTimerController((taskName) -> {
-//                    System.out.println("Timer set for " + taskName +
-//                            " for minutes.");
-//                });
-//
-//        // ---- 5. Build actual UI panel ----
-//        TaskListView panel = new TaskListView(taskController, viewModel, dummyTimerController);
-//
-//        // ---- 6. Put into a JFrame ----
-//        javax.swing.JFrame frame = new javax.swing.JFrame("TaskListPanel Test");
-//        frame.setDefaultCloseOperation(javax.swing.JFrame.EXIT_ON_CLOSE);
-//        frame.setSize(400, 500);
-//        frame.setContentPane(panel);
-//        frame.setVisible(true);
-//    }
+    public static void main(String[] args) {
+
+        // ---- 1. Create a fake DAO with some demo tasks ----
+        use_cases.TaskListDataAccessInterface dao = new data_access.InMemoryTaskListDataAccessObject();
+
+        entity.Task t1 = entity.Task.TaskFactory.createTask("Test Task A");
+        entity.Task t2 = entity.Task.TaskFactory.createTask("Test Task B");
+        dao.saveAllTasks(java.util.Arrays.asList(t1, t2));
+
+        // ---- 2. Build view model + presenter ----
+        interface_adapter.TaskListViewModel viewModel = new interface_adapter.TaskListViewModel();
+        use_cases.TaskListOutputBoundary presenter =
+                new interface_adapter.TaskListPresenter(viewModel);
+
+        // ---- 3. Build interactor + controller ----
+        use_cases.TaskListInputBoundary interactor =
+                new use_cases.TaskListInteractor(dao, presenter);
+
+        interface_adapter.TaskListController taskController =
+                new interface_adapter.TaskListController(interactor);
+
+        // ---- 4. Dummy SetTimerController (so timer button won't crash) ----
+        interface_adapter.SetTimerController dummyTimerController =
+                new interface_adapter.SetTimerController((taskName) -> {
+                    System.out.println("Timer set for " + taskName +
+                            " for minutes.");
+                });
+
+        // ---- 5. Build actual UI panel ----
+        TaskListView panel = new TaskListView(taskController, viewModel, dummyTimerController);
+
+        // ---- 6. Put into a JFrame ----
+        javax.swing.JFrame frame = new javax.swing.JFrame("TaskListPanel Test");
+        frame.setDefaultCloseOperation(javax.swing.JFrame.EXIT_ON_CLOSE);
+        frame.setSize(400, 500);
+        frame.setContentPane(panel);
+        frame.setVisible(true);
+    }
 
 }
