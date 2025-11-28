@@ -3,38 +3,201 @@ package entity;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class Task {
-    private String title;
-    private boolean isCompleted;
 
-    // --- TIMER FIELDS ---
+    private final String id;
+    private String taskName;
+    private Category category;
     private LocalDateTime dueDate;
-    private List<LocalDateTime> remindDates;
+    private final List<Reminder> reminders;
+    private int priorityOverride; // -1 = no pin, >=0 = pinned index
+    private boolean isComplete;
+    private LocalDateTime completedAt;
     private boolean notificationSent;
 
-    public Task(String title) {
-        this.title = title;
-        this.isCompleted = false;
-        this.notificationSent = false;
-        this.remindDates = new ArrayList<>();
+    private Task(String id, String taskName) {
+        if (id == null || id.isBlank()) {
+            throw new IllegalArgumentException("Task id cannot be null or blank");
+        }
+        if (taskName == null || taskName.isBlank()) {
+            throw new IllegalArgumentException("Task name cannot be null or blank");
+        }
+        this.id = id;
+        this.taskName = taskName;
+        this.category = Category.UNSORTED;
+        this.reminders = new ArrayList<>();
+        this.priorityOverride = -1;
+        this.isComplete = false;
+    }
+    private Task(String id, String taskName, Category category) {
+        this(id, taskName);
+        setCategory(category);
     }
 
-    // --- GETTERS & SETTERS ---
-    public String getTitle() { return title; }
+    public String getId() {
+        return id;
+    }
 
-    public boolean isCompleted() { return isCompleted; }
-    public void setCompleted(boolean completed) { this.isCompleted = completed; }
+    public String getTaskName() {
+        return taskName;
+    }
 
-    public LocalDateTime getDueDate() { return dueDate; }
+    public void setTaskName(String taskName) {
+        if (taskName == null || taskName.isBlank()) {
+            throw new IllegalArgumentException("Task name cannot be null or blank");
+        }
+        this.taskName = taskName;
+    }
+
+    public Category getCategory() {
+        return category;
+    }
+
+    public void setCategory(Category category) {
+        this.category = Objects.requireNonNullElse(category, Category.UNSORTED);
+    }
+
+    public LocalDateTime getDueDate() {
+        return dueDate;
+    }
+
     public void setDueDate(LocalDateTime dueDate) {
         this.dueDate = dueDate;
-        this.notificationSent = false; // Reset if date changes [cite: 51]
     }
 
-    public List<LocalDateTime> getRemindDates() { return remindDates; }
-    public void setRemindDates(List<LocalDateTime> remindDates) { this.remindDates = remindDates; }
+    public List<Reminder> getReminders() {
+        return new ArrayList<>(reminders);
+    }
 
-    public boolean isNotificationSent() { return notificationSent; }
-    public void setNotificationSent(boolean sent) { this.notificationSent = sent; }
+    public void addReminder(LocalDateTime time) {
+        if (time != null) {
+            reminders.add(new Reminder(time));
+        }
+    }
+
+    public void removeReminder(LocalDateTime time) {
+        if (time == null) return;
+        reminders.removeIf(r -> r.getTime().equals(time));
+    }
+
+    public void addReminders(List<LocalDateTime> times) {
+        if (times == null) return;
+
+        for (LocalDateTime time : times) {
+            if (time != null) {
+                reminders.add(new Reminder(time));
+            }
+        }
+    }
+
+
+    public void markReminderSent(LocalDateTime time) {
+        for (Reminder r : reminders) {
+            if (r.getTime().equals(time)) {
+                r.markSent();
+                break;
+            }
+        }
+    }
+
+    public int getPriorityOverride() {
+        return priorityOverride;
+    }
+
+    public void setPriorityOverride(int priorityOverride) {
+        this.priorityOverride = priorityOverride;
+    }
+
+    public boolean isComplete() {
+        return isComplete;
+    }
+
+    public LocalDateTime getCompletedAt() {
+        return completedAt;
+    }
+
+    public void setComplete(boolean complete) {
+        isComplete = complete;
+        if (complete) {
+            this.completedAt = LocalDateTime.now();
+        } else {
+            this.completedAt = null;
+        }
+    }
+
+    public void toggleComplete() {
+        isComplete = !isComplete;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Task)) return false;
+        Task task = (Task) o;
+        return Objects.equals(id, task.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
+
+    @Override
+    public String toString() {
+        return "Task{" +
+                "id='" + id + '\'' +
+                ", taskName='" + taskName + '\'' +
+                ", category=" + category +
+                ", dueDate=" + dueDate +
+                ", priorityOverride=" + priorityOverride +
+                ", isComplete=" + isComplete +
+                '}';
+    }
+
+    public void setNotificationSent(boolean b) { // not entirely sure what this is for. leaving it here for now
+        notificationSent = b;
+    }
+
+    public static class TaskFactory {
+        private static long nextId = 1;
+
+        public static Task createTask(String taskName) {
+            String id = "task-" + nextId;
+            nextId++;
+            return new Task(id, taskName);
+        }
+
+        public static Task createTask(String taskName, Category category) {
+            String id = "task-" + nextId;
+            nextId++;
+            return new Task(id, taskName, category);
+        }
+    }
+
+    public static class Reminder {
+        private final LocalDateTime time;
+        private boolean isNotificationSent;
+
+        public Reminder(LocalDateTime time) {
+            if (time == null) {
+                throw new IllegalArgumentException("Reminder time cannot be null");
+            }
+            this.time = time;
+            this.isNotificationSent = false;
+        }
+
+        public LocalDateTime getTime() {
+            return time;
+        }
+
+        public boolean isNotificationSent() {
+            return isNotificationSent;
+        }
+
+        public void markSent() {
+            this.isNotificationSent = true;
+        }
+    }
 }

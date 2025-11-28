@@ -31,12 +31,15 @@ public class SetTimerInteractor implements SetTimerInputBoundary {
         task.setDueDate(due);
         List<LocalDateTime> reminders = new ArrayList<>();
         reminders.add(remind);
-        task.setRemindDates(reminders);
+        task.addReminders(reminders);
 
         task.setNotificationSent(false); // Reset notification status
 
         // Save
         dataAccess.saveTask(task);
-        presenter.prepareSuccessView("Timer set for: " + taskTitle);
+      
+      //TODO: Remove the getTask stuff inside main.java
+        SetTimerOutputData output = new SetTimerOutputData("Timer set for: " + task.getTaskName());
+        presenter.prepareSuccessView(output);
     }
 }

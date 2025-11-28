@@ -52,6 +52,21 @@ import view.LoginView;
 import view.PokemonPanel;
 import view.SignupView;
 import view.ViewManager;
+import data_access.InMemoryTaskListDataAccessObject;
+import interface_adapter.TaskListController;
+import interface_adapter.TaskListPresenter;
+import interface_adapter.TaskListViewModel;
+import use_cases.TaskListDataAccessInterface;
+import use_cases.TaskListInputBoundary;
+import use_cases.TaskListOutputBoundary;
+import use_cases.TaskListInteractor;
+import view.TaskListView;
+
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.util.List;
 
 public class Main {
 
@@ -72,6 +87,31 @@ public class Main {
             // 2. DATA ACCESS
             UserDataAccessObject userDataAccessObject = new UserDataAccessObject();
             SignupDataAccessObject signupDAO = new SignupDataAccessObject();
+// DUMMY DATA -- PARSE THROUGH THIS LATER AND CLEANUP
+//                 @Override
+//                 public DashboardConfig load() {
+//                     return config;
+//                 }
+//             };
+//             // #################################################################################
+
+//             // -------------------------------
+//             // VIEW MODEL
+//             // Stores UI state and notifies views when it changes.
+//             // -------------------------------
+//             DashboardViewModel viewModel = new DashboardViewModel();
+
+//             ConfigureDashboardOutputBoundary presenter =
+//                     new ConfigureDashboardPresenter(viewModel);
+//             ConfigureDashboardInputBoundary interactor =
+//                     new ConfigureDashboardInteractor(gateway, presenter);
+//             ConfigureDashboardController controller =
+//                     new ConfigureDashboardController(interactor);
+
+//             viewModel.setConfig(gateway.load());
+//             List<Task> allTasks = new ArrayList<>();
+//             allTasks.add(Task.TaskFactory.createTask("Finish Homework")); // Dummy Data
+//             allTasks.add(Task.TaskFactory.createTask("Email Professor"));
 
             List<Task> allTasks = new ArrayList<>();
             allTasks.add(new Task("Finish Project"));
@@ -119,25 +159,41 @@ public class Main {
             ConfigureDashboardInputBoundary configInteractor = new ConfigureDashboardInteractor(configGateway, configPresenter);
             ConfigureDashboardController configController = new ConfigureDashboardController(configInteractor);
 
+                                   
+// TODO: COMBINE THE BELOW TWO
             // 7. BUILD PANELS
-            JPanel taskPanel = new JPanel();
-            taskPanel.setLayout(new BoxLayout(taskPanel, BoxLayout.Y_AXIS));
-            taskPanel.add(new JLabel("My To-Do List:"));
-            JPanel taskRow = new JPanel(new FlowLayout(FlowLayout.LEFT));
-            JLabel taskName = new JLabel("Finish Homework");
-            taskRow.add(taskName);
-            JButton timerButton = new JButton("⏱️");
-            timerButton.addActionListener(e -> {
-                String input = JOptionPane.showInputDialog(taskPanel, "Set timer (minutes):");
-                if (input != null && !input.isEmpty()) {
-                    try {
-                        long mins = Long.parseLong(input);
-                        timerController.execute("Finish Homework", mins, 0);
-                    } catch (NumberFormatException ex) { }
-                }
-            });
-            taskRow.add(timerButton);
-            taskPanel.add(taskRow);
+//             JPanel taskPanel = new JPanel();
+//             taskPanel.setLayout(new BoxLayout(taskPanel, BoxLayout.Y_AXIS));
+//             taskPanel.add(new JLabel("My To-Do List:"));
+//             JPanel taskRow = new JPanel(new FlowLayout(FlowLayout.LEFT));
+//             JLabel taskName = new JLabel("Finish Homework");
+//             taskRow.add(taskName);
+//             JButton timerButton = new JButton("⏱️");
+//             timerButton.addActionListener(e -> {
+//                 String input = JOptionPane.showInputDialog(taskPanel, "Set timer (minutes):");
+//                 if (input != null && !input.isEmpty()) {
+//                     try {
+//                         long mins = Long.parseLong(input);
+//                         timerController.execute("Finish Homework", mins, 0);
+//                     } catch (NumberFormatException ex) { }
+//                 }
+//             });
+//             taskRow.add(timerButton);
+//             taskPanel.add(taskRow);
+                                   
+            // IMPORTANT TODO: Replace with Firebase
+            TaskListDataAccessInterface taskListDAO = new InMemoryTaskListDataAccessObject();
+
+            TaskListViewModel taskListViewModel = new TaskListViewModel();
+            TaskListOutputBoundary taskListPresenter = new TaskListPresenter(taskListViewModel);
+
+            TaskListInputBoundary taskListInteractor =
+                    new TaskListInteractor(taskListDAO, taskListPresenter);
+            TaskListController taskListController =
+                    new TaskListController(taskListInteractor);
+
+            JPanel taskPanel = new TaskListView(taskListController, taskListViewModel, timerController);
+            // -------------------------------
 
             JPanel stockPanel = new JPanel(); stockPanel.add(new JLabel("Stocks Placeholder"));
             JPanel weatherPanel = new JPanel(); weatherPanel.add(new JLabel("Weather Placeholder"));
