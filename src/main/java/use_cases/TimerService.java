@@ -11,13 +11,11 @@ import java.util.concurrent.TimeUnit;
 public class TimerService {
     public void startTimer(List<Task> tasks) {
         ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
-
-        // Check every 5 seconds
         scheduler.scheduleAtFixedRate(() -> {
             LocalDateTime now = LocalDateTime.now();
             for (Task task : tasks) {
-                // Skip completed tasks [cite: 49]
-                if (task.isCompleted()) continue;
+                // Alt Flow: Task complete -> No notification [cite: 49]
+                if (task.isComplete()) continue;
 
                 List<Task.Reminder> reminders = task.getReminders();
                 if (reminders == null || reminders.isEmpty()) {
@@ -29,11 +27,11 @@ public class TimerService {
                     if (!reminder.isNotificationSent()
                             && (now.isAfter(reminder.getTime()) || now.isEqual(reminder.getTime()))) {
 
-                    // Trigger notification if time is up and not sent yet
-                    if (now.isAfter(remindTime) && !task.isNotificationSent()) {
                         SwingUtilities.invokeLater(() ->
-                                JOptionPane.showMessageDialog(null,
-                                        "⏰ REMINDER: " + task.getTitle() + " is due soon!")
+                                JOptionPane.showMessageDialog(
+                                        null,
+                                        "⏰ Due soon: " + task.getTaskName()
+                                )
                         );
 
                         // mark this reminder as sent so we don't spam

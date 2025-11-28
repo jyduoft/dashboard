@@ -1,4 +1,5 @@
 package use_cases;
+
 import entity.Task;
 
 public interface TaskDataAccessInterface {

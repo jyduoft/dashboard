@@ -1,12 +1,13 @@
 package interface_adapter;
 
 import use_cases.SetTimerOutputBoundary;
+import use_cases.SetTimerOutputData;
 import javax.swing.JOptionPane;
 
 public class SetTimerPresenter implements SetTimerOutputBoundary {
     @Override
-    public void prepareSuccessView(String message) {
-        System.out.println("Success: " + message);
+    public void prepareSuccessView(SetTimerOutputData data) {
+        JOptionPane.showMessageDialog(null, data.getMessage());
     }
 
     @Override

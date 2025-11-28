@@ -3,10 +3,8 @@ package data_access;
 import entity.User;
 import okhttp3.*;
 import org.json.JSONObject;
-import use_cases.login.LoginUserDataAccessInterface;
-import java.io.IOException;
 
-public class UserDataAccessObject implements LoginUserDataAccessInterface {
+public class UserDataAccessObject {
 
     private static final MediaType JSON_MEDIA = MediaType.parse("application/json");
 
@@ -58,58 +56,7 @@ public class UserDataAccessObject implements LoginUserDataAccessInterface {
 
         return new JSONObject(json);
     }
-    public boolean existsByName(String identifier) {
-        Request request = new Request.Builder()
-                .url(BASE_URL + identifier + ".json")
-                .get()
-                .build();
 
-        try {
-            Response response = client.newCall(request).execute();
-            String body = response.body().string();
-            return !body.equals("null");
-        } catch (IOException e) {
-            e.printStackTrace();
-            return false;
-        }
-    }
-
-    // 2. Required to verify password
-    @Override
-    public User get(String username) {
-        Request request = new Request.Builder()
-                .url(BASE_URL + username + ".json")
-                .get()
-                .build();
-
-        try {
-            Response response = client.newCall(request).execute();
-            String body = response.body().string();
-
-            if (body.equals("null")) {
-                return null;
-            }
-
-            JSONObject json = new JSONObject(body);
-            String password = json.getString("password");
-
-            // IMPORTANT: This assumes your User class has this constructor.
-            // If User is an interface, you MUST create a 'CommonUser' class.
-            // If User is a class, this works.
-            return new entity.User(username, password);
-
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    // 3. Required by the interface (redirects to teammate's method)
-    @Override
-    public void save(User user) {
-        try {
-            createUser(user);
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to save user", e);
-        }
-    }
+    // make a new method that lets user log in with password and check the user pass word and see if its right
 }
+// make password hasher to mess up the password and unscramble it in thiss progarm.
