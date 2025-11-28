@@ -1,57 +1,33 @@
 package app;
 
-import java.awt.*;
+import data_access.UserDataAccessObject;
+import entity.DashboardConfig;
+import entity.Task;
+import interface_adapter.ConfigureDashboardController;
+import interface_adapter.ConfigureDashboardPresenter;
+import interface_adapter.DashboardViewModel;
+import interface_adapter.SetTimerController;
+import interface_adapter.SetTimerPresenter;
 import java.util.ArrayList;
 import java.util.List;
-import javax.swing.*;
-import org.json.JSONObject;
-
-// Entities
-import entity.DashboardConfig;
-import entity.Pokemon;
-import entity.Task;
-import entity.User;
-
-// Data Access
-import data_access.PokemonDataAccessObject;
-import data_access.SignupDataAccessObject;
-import data_access.UserDataAccessObject;
-
-// Use Cases
-import use_cases.DashboardConfigDataAccessInterface;
-import use_cases.TaskDataAccessInterface;
-import use_cases.PokemonManager;
-import use_cases.TimerService;
+import use_cases.*;
 import use_cases.ConfigureDashboardInputBoundary;
 import use_cases.ConfigureDashboardInteractor;
 import use_cases.ConfigureDashboardOutputBoundary;
-import use_cases.SetTimerInteractor;
-
-// Use Cases - Subfolders
-import use_cases.login.LoginInteractor;
-import use_cases.signup.SignupInteractor;
-
-// Interface Adapters
-import interface_adapter.ViewManagerModel;
-import interface_adapter.DashboardViewModel;
+import use_cases.DashboardConfigDataAccessInterface;
+import entity.User;
+import entity.Pokemon;
 import interface_adapter.ConfigureDashboardController;
 import interface_adapter.ConfigureDashboardPresenter;
-import interface_adapter.SetTimerController;
-import interface_adapter.SetTimerPresenter;
-
-// Interface Adapters - Subfolders
-import interface_adapter.login.LoginController;
-import interface_adapter.login.LoginPresenter;
-import interface_adapter.login.LoginViewModel;
-import interface_adapter.signup.SignupController;
-import interface_adapter.signup.SignupPresenter;
-import interface_adapter.signup.SignupViewModel;
-
-// Views
-import view.LoginView;
+import interface_adapter.DashboardViewModel;
+import org.json.JSONObject;
+import use_cases.*;
+import view.MainDashboardView;
 import view.PokemonPanel;
-import view.SignupView;
-import view.ViewManager;
+import data_access.PokemonDataAccessObject;
+import view.StockPanel;
+import data_access.StockDataAccessObject;
+
 import data_access.InMemoryTaskListDataAccessObject;
 import interface_adapter.TaskListController;
 import interface_adapter.TaskListPresenter;
@@ -73,114 +49,97 @@ public class Main {
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
 
-            // 1. SETUP MAIN WINDOW
-            JFrame frame = new JFrame("Dashboard Demo");
-            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-            frame.setSize(900, 600);
-            frame.setLocationRelativeTo(null);
+            // #################################################################################
+            // ## Here is just a simple implementation of memory
+            // ## We can replace this with a database-based implementation Later.
+            // #################################################################################
+            DashboardConfigDataAccessInterface gateway = new DashboardConfigDataAccessInterface() {
+                private DashboardConfig config =
+                        new DashboardConfig(true, true, true, true, true);
 
-            CardLayout cardLayout = new CardLayout();
-            JPanel views = new JPanel(cardLayout);
-            ViewManagerModel viewManagerModel = new ViewManagerModel();
-            new ViewManager(views, cardLayout, viewManagerModel);
+                @Override
+                public void save(DashboardConfig c) {
+                    this.config = c;
+                }
 
-            // 2. DATA ACCESS
-            UserDataAccessObject userDataAccessObject = new UserDataAccessObject();
-            SignupDataAccessObject signupDAO = new SignupDataAccessObject();
-// DUMMY DATA -- PARSE THROUGH THIS LATER AND CLEANUP
-//                 @Override
-//                 public DashboardConfig load() {
-//                     return config;
-//                 }
-//             };
-//             // #################################################################################
+                @Override
+                public DashboardConfig load() {
+                    return config;
+                }
+            };
+            // #################################################################################
 
-//             // -------------------------------
-//             // VIEW MODEL
-//             // Stores UI state and notifies views when it changes.
-//             // -------------------------------
-//             DashboardViewModel viewModel = new DashboardViewModel();
+            // -------------------------------
+            // VIEW MODEL
+            // Stores UI state and notifies views when it changes.
+            // -------------------------------
+            DashboardViewModel viewModel = new DashboardViewModel();
 
-//             ConfigureDashboardOutputBoundary presenter =
-//                     new ConfigureDashboardPresenter(viewModel);
-//             ConfigureDashboardInputBoundary interactor =
-//                     new ConfigureDashboardInteractor(gateway, presenter);
-//             ConfigureDashboardController controller =
-//                     new ConfigureDashboardController(interactor);
+            ConfigureDashboardOutputBoundary presenter =
+                    new ConfigureDashboardPresenter(viewModel);
+            ConfigureDashboardInputBoundary interactor =
+                    new ConfigureDashboardInteractor(gateway, presenter);
+            ConfigureDashboardController controller =
+                    new ConfigureDashboardController(interactor);
 
-//             viewModel.setConfig(gateway.load());
-//             List<Task> allTasks = new ArrayList<>();
-//             allTasks.add(Task.TaskFactory.createTask("Finish Homework")); // Dummy Data
-//             allTasks.add(Task.TaskFactory.createTask("Email Professor"));
-
+            viewModel.setConfig(gateway.load());
             List<Task> allTasks = new ArrayList<>();
-            allTasks.add(new Task("Finish Project"));
+            allTasks.add(Task.TaskFactory.createTask("Finish Homework")); // Dummy Data
+            allTasks.add(Task.TaskFactory.createTask("Email Professor"));
+
             TaskDataAccessInterface taskDAO = new TaskDataAccessInterface() {
-                @Override public Task getTask(String title) {
-                    for (Task t : allTasks) if (t.getTitle().equals(title)) return t;
+                @Override
+                public Task getTask(String title) {
+                    // Simple search logic for our list
+                    for (Task t : allTasks) {
+                        if (t.getTaskName().equals(title)) return t;
+                    }
                     return null;
                 }
-                @Override public void saveTask(Task task) {
-                    System.out.println("Timer saved for: " + task.getTitle());
+
+                @Override
+                public void saveTask(Task task) {
+                    System.out.println("Task saved: " + task.getTaskName());
                 }
             };
 
-            // 3. SETUP TIMER
-            SetTimerPresenter timerPresenter = new SetTimerPresenter();
-            SetTimerInteractor timerInteractor = new SetTimerInteractor(taskDAO, timerPresenter);
+            SetTimerOutputBoundary timerPresenter = new SetTimerPresenter();
+            SetTimerInputBoundary timerInteractor = new SetTimerInteractor(taskDAO, timerPresenter);
             SetTimerController timerController = new SetTimerController(timerInteractor);
 
-            // 4. SETUP LOGIN
-            LoginViewModel loginViewModel = new LoginViewModel();
-            LoginPresenter loginPresenter = new LoginPresenter(loginViewModel, viewManagerModel);
-            LoginInteractor loginInteractor = new LoginInteractor(userDataAccessObject, loginPresenter);
-            LoginController loginController = new LoginController(loginInteractor);
+            TimerService timerService = new TimerService();
+            timerService.startTimer(allTasks);
 
-            // FIX: Pass viewManagerModel here so the 'Sign Up' button works
-            LoginView loginView = new LoginView(loginViewModel, loginController, viewManagerModel);
-            views.add(loginView, loginView.viewName);
+            // -------------------------------
+            // Program Panels
+            // I just write a string here as example, we could substitute it
+            // with each functional implementation
+            // -------------------------------
+//            JPanel taskPanel = new JPanel();
+//            taskPanel.setLayout(new BoxLayout(taskPanel, BoxLayout.Y_AXIS));
+//            taskPanel.add(new JLabel("My To-Do List:"));
+//            JPanel taskRow = new JPanel(new FlowLayout(FlowLayout.LEFT));
+//            taskRow.setMaximumSize(new Dimension(Integer.MAX_VALUE, 40));
+//            JLabel taskName = new JLabel("Finish Homework");
+//            taskRow.add(taskName);
+//            JButton timerButton = new JButton("⏱️");
+//            timerButton.setToolTipText("Set Timer");
+//            timerButton.addActionListener(e -> {
+//                String input = JOptionPane.showInputDialog(taskPanel, "Set timer (minutes):");
+//                if (input != null && !input.isEmpty()) {
+//                    try {
+//                        long mins = Long.parseLong(input);
+//                        timerController.execute("Finish Homework", mins, 0);
+//                    } catch (NumberFormatException ex) {
+//                        JOptionPane.showMessageDialog(taskPanel, "Please enter a valid number.");
+//                    }
+//                }
+//            });
+//
+//            taskRow.add(timerButton);
+//
+//            taskPanel.add(taskRow);
 
-            // 5. SETUP SIGNUP
-            SignupViewModel signupViewModel = new SignupViewModel();
-            SignupPresenter signupPresenter = new SignupPresenter(signupViewModel, viewManagerModel);
-            SignupInteractor signupInteractor = new SignupInteractor(signupDAO, signupPresenter);
-            SignupController signupController = new SignupController(signupInteractor);
-            SignupView signupView = new SignupView(signupController, signupViewModel);
-            views.add(signupView, signupView.viewName);
-
-            // 6. SETUP DASHBOARD CONFIG
-            DashboardConfigDataAccessInterface configGateway = new DashboardConfigDataAccessInterface() {
-                private DashboardConfig config = new DashboardConfig(true, true, true, true, true);
-                @Override public void save(DashboardConfig c) { this.config = c; }
-                @Override public DashboardConfig load() { return config; }
-            };
-            DashboardViewModel dashboardViewModel = new DashboardViewModel();
-            ConfigureDashboardOutputBoundary configPresenter = new ConfigureDashboardPresenter(dashboardViewModel);
-            ConfigureDashboardInputBoundary configInteractor = new ConfigureDashboardInteractor(configGateway, configPresenter);
-            ConfigureDashboardController configController = new ConfigureDashboardController(configInteractor);
-
-                                   
-// TODO: COMBINE THE BELOW TWO
-            // 7. BUILD PANELS
-//             JPanel taskPanel = new JPanel();
-//             taskPanel.setLayout(new BoxLayout(taskPanel, BoxLayout.Y_AXIS));
-//             taskPanel.add(new JLabel("My To-Do List:"));
-//             JPanel taskRow = new JPanel(new FlowLayout(FlowLayout.LEFT));
-//             JLabel taskName = new JLabel("Finish Homework");
-//             taskRow.add(taskName);
-//             JButton timerButton = new JButton("⏱️");
-//             timerButton.addActionListener(e -> {
-//                 String input = JOptionPane.showInputDialog(taskPanel, "Set timer (minutes):");
-//                 if (input != null && !input.isEmpty()) {
-//                     try {
-//                         long mins = Long.parseLong(input);
-//                         timerController.execute("Finish Homework", mins, 0);
-//                     } catch (NumberFormatException ex) { }
-//                 }
-//             });
-//             taskRow.add(timerButton);
-//             taskPanel.add(taskRow);
-                                   
             // IMPORTANT TODO: Replace with Firebase
             TaskListDataAccessInterface taskListDAO = new InMemoryTaskListDataAccessObject();
 
@@ -195,55 +154,102 @@ public class Main {
             JPanel taskPanel = new TaskListView(taskListController, taskListViewModel, timerController);
             // -------------------------------
 
-            JPanel stockPanel = new JPanel(); stockPanel.add(new JLabel("Stocks Placeholder"));
-            JPanel weatherPanel = new JPanel(); weatherPanel.add(new JLabel("Weather Placeholder"));
+//--------------------------------
+// Small APP Panel
+// -------------------------------
 
-            // Pokemon Panel Setup
-            PokemonPanel pokemonPanel = null;
+            StockDataAccessObject stockDAO = new StockDataAccessObject();
+            StockPanel stockPanel = new StockPanel(stockDAO);
+
+            JPanel weatherPanel = new JPanel();
+            weatherPanel.add(new JLabel("Weather panel"));
+
+            JPanel mapPanel = new JPanel();
+            mapPanel.add(new JLabel("Map panel"));
+
+//--------------------------------
+// Pokémon Panel
+// -------------------------------
+            User user = new User("tony", "123456");
+            UserDataAccessObject userDAO = new UserDataAccessObject();
+            PokemonDataAccessObject pokemonDAO = new PokemonDataAccessObject();
+
+            //load or create Firebase user
+            JSONObject userJson;
             try {
-                User user = new User("tony", "123456");
-                PokemonDataAccessObject pokemonDAO = new PokemonDataAccessObject();
-                try {
-                    userDataAccessObject.loadUser(user);
-                } catch (Exception e) {
-                    userDataAccessObject.createUser(user);
-                }
-                PokemonManager pokemonManager = new PokemonManager(user);
-                if (pokemonManager.getUserInv().isEmpty() || pokemonManager.getCurrentPokemon() == null) {
-                    Pokemon charmander = new Pokemon("Charmander", "src/main/resources/cache/pokemon/4.gif", 4, 1, 0, 100, 100);
-                    pokemonManager.getUserInv().add(charmander);
-                    pokemonManager.setCurrentPokemon(charmander);
-                    pokemonDAO.saveUserData(user, pokemonManager);
-                }
-                pokemonDAO.fetchPokemonSprites(pokemonManager.getUserInv());
-                ImageIcon gifIcon = new ImageIcon(pokemonManager.getCurrentPokemon().getImgFilePath());
-                pokemonPanel = new PokemonPanel(gifIcon);
+                userJson = userDAO.loadUser(user);     // user exists → load data
+                System.out.println("Loaded existing Firebase user.");
             } catch (Exception e) {
-                System.out.println("Pokemon Error: " + e.getMessage());
-                pokemonPanel = new PokemonPanel(new ImageIcon());
+                System.out.println("User does not exist. Creating new Firebase user...");
+                try {
+                    userDAO.createUser(user);          // create user
+                    userJson = userDAO.loadUser(user); // reload
+                } catch (Exception ex) {
+                    throw new RuntimeException("Failed to create user: " + ex.getMessage());
+                }
             }
 
-            // 8. ASSEMBLE DASHBOARD
-            JPanel dashboardView = new JPanel(new GridLayout(2, 2));
-            dashboardView.add(taskPanel);
-            dashboardView.add(pokemonPanel);
-            dashboardView.add(stockPanel);
-            dashboardView.add(weatherPanel);
+            //create PokémonManager using loaded JSON
+            PokemonManager pokemonManager = null;
+            try {
+                pokemonManager = new PokemonManager(user);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
 
-            // Register names
-            views.add(dashboardView, "logged in");
-            views.add(dashboardView, "dashboard");
+            //ensure user has a current Pokémon
+            if (pokemonManager.getUserInv().isEmpty() || pokemonManager.getCurrentPokemon() == null) {
 
-            frame.add(views);
+                Pokemon charmander = new Pokemon(
+                        "Charmander",
+                        "src/main/resources/cache/pokemon/4.gif",
+                        4,
+                        1,
+                        0,
+                        100,
+                        100
+                );
 
-            // START AT LOGIN
-            viewManagerModel.setActiveView(loginView.viewName);
-            viewManagerModel.firePropertyChanged();
+                pokemonManager.getUserInv().add(charmander);
+                pokemonManager.setCurrentPokemon(charmander);
 
+                // Save back to Firebase
+                try {
+                    pokemonDAO.saveUserData(user, pokemonManager);
+                } catch (Exception ex) {
+                    System.out.println("Error saving default Pokémon: " + ex.getMessage());
+                }
+            }
+
+            //download missing sprite GIFs
+            pokemonDAO.fetchPokemonSprites(pokemonManager.getUserInv());
+
+            //load the GIF from local cache
+            String imgPath = pokemonManager.getCurrentPokemon().getImgFilePath();
+            ImageIcon gifIcon = new ImageIcon(imgPath);
+
+            //build Pokémon panel
+            PokemonPanel pokemonPanel = new PokemonPanel(gifIcon);
+
+
+            // -------------------------------
+            // Main Panel and Frame setup
+            // -------------------------------
+            MainDashboardView dashboardView = new MainDashboardView(
+                    taskPanel,
+                    stockPanel,
+                    weatherPanel,
+                    mapPanel,
+                    pokemonPanel,
+                    viewModel, controller
+            );
+
+            JFrame frame = new JFrame("Dashboard Demo");
+            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+            frame.getContentPane().add(dashboardView, BorderLayout.CENTER);
+            frame.setSize(900, 600);
+            frame.setLocationRelativeTo(null);
             frame.setVisible(true);
-
-            TimerService timerService = new TimerService();
-            timerService.startTimer(allTasks);
         });
     }
 }

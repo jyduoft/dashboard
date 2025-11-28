@@ -1,6 +1,6 @@
 package use_cases;
 
 public interface SetTimerOutputBoundary {
-    void prepareSuccessView(String message);
+    void prepareSuccessView(SetTimerOutputData outputData);
     void prepareFailView(String error);
 }
