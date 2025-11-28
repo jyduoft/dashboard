@@ -40,6 +40,6 @@ public class SetTimerInteractor implements SetTimerInputBoundary {
       
       //TODO: Remove the getTask stuff inside main.java
         SetTimerOutputData output = new SetTimerOutputData("Timer set for: " + task.getTaskName());
-        presenter.prepareSuccessView(output);
+        presenter.prepareSuccessView(String.valueOf(output));
     }
 }
