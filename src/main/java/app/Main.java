@@ -27,6 +27,8 @@ import view.PokemonPanel;
 import data_access.PokemonDataAccessObject;
 import view.StockPanel;
 import data_access.StockDataAccessObject;
+import data_access.WeatherDataAccessObject;
+import view.WeatherPanel;
 
 import data_access.InMemoryTaskListDataAccessObject;
 import interface_adapter.TaskListController;
@@ -161,8 +163,8 @@ public class Main {
             StockDataAccessObject stockDAO = new StockDataAccessObject();
             StockPanel stockPanel = new StockPanel(stockDAO);
 
-            JPanel weatherPanel = new JPanel();
-            weatherPanel.add(new JLabel("Weather panel"));
+            WeatherDataAccessObject weatherDAO = new WeatherDataAccessObject();
+            WeatherPanel weatherPanel = new WeatherPanel(weatherDAO);
 
             JPanel mapPanel = new JPanel();
             mapPanel.add(new JLabel("Map panel"));

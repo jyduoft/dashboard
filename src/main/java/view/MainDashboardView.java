@@ -76,27 +76,37 @@ public class MainDashboardView extends JPanel implements PropertyChangeListener 
         remove(pokemonPanel);
         centerPanel.removeAll();
 
+        // Task Panel: set always on the leftmost with almost half of the screen
         if (config.isShowTasks()) {
+            taskPanel.setPreferredSize(new Dimension(400, taskPanel.getHeight()));
             add(taskPanel, BorderLayout.WEST);
         }
 
-        List<JPanel> widgets = new ArrayList<>();
-        if (config.isShowStocks()) widgets.add(stockPanel);
-        if (config.isShowWeather()) widgets.add(weatherPanel);
-        if (config.isShowMap()) widgets.add(mapPanel);
+        // Components Panel: set at right with 4*4 blocks
+        java.util.List<JPanel> widgets = new ArrayList<>();
+        if (config.isShowStocks()) {
+            widgets.add(stockPanel);
+        }
+        if (config.isShowMap()) {
+            widgets.add(mapPanel);
+        }
+        if (config.isShowWeather()) {
+            widgets.add(weatherPanel);
+        }
 
-        int count = widgets.size();
-        if (count == 0) {
+        if (widgets.isEmpty()) {
             centerPanel.setLayout(new BorderLayout());
             centerPanel.add(new JLabel("No widgets selected.", SwingConstants.CENTER),
                     BorderLayout.CENTER);
         } else {
-            centerPanel.setLayout(new GridLayout(1, count));
+            centerPanel.setLayout(new GridLayout(2, 2, 10, 10));
+
             for (JPanel widget : widgets) {
                 centerPanel.add(widget);
             }
         }
 
+        // Set Pokemon Panel at bottem.
         if (config.isShowPokemon()) {
             add(pokemonPanel, BorderLayout.SOUTH);
         }
@@ -104,4 +114,5 @@ public class MainDashboardView extends JPanel implements PropertyChangeListener 
         revalidate();
         repaint();
     }
+
 }
