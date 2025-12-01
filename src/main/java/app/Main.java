@@ -31,6 +31,8 @@ import data_access.WeatherDataAccessObject;
 import view.WeatherPanel;
 import data_access.NbaGamesDataAccessObject;
 import view.NbaGamesPanel;
+import data_access.MapDataAccessObject;
+import view.MapPanel;
 
 import data_access.InMemoryTaskListDataAccessObject;
 import interface_adapter.TaskListController;
@@ -59,7 +61,8 @@ public class Main {
             // #################################################################################
             DashboardConfigDataAccessInterface gateway = new DashboardConfigDataAccessInterface() {
                 private DashboardConfig config =
-                        new DashboardConfig(true, true, true, true, true);
+                        new DashboardConfig(true, true, true,
+                                true, true, true);
 
                 @Override
                 public void save(DashboardConfig c) {
@@ -169,7 +172,11 @@ public class Main {
             WeatherPanel weatherPanel = new WeatherPanel(weatherDAO);
 
             NbaGamesDataAccessObject nbaDAO = new NbaGamesDataAccessObject();
-            NbaGamesPanel mapPanel = new NbaGamesPanel(nbaDAO);
+            NbaGamesPanel sportsPanel = new NbaGamesPanel(nbaDAO);
+
+            MapDataAccessObject mapDAO = new MapDataAccessObject();
+            MapPanel mapPanel = new MapPanel(mapDAO);
+
 
 //--------------------------------
 // Pokémon Panel
@@ -243,6 +250,7 @@ public class Main {
                     taskPanel,
                     stockPanel,
                     weatherPanel,
+                    sportsPanel,
                     mapPanel,
                     pokemonPanel,
                     viewModel, controller

@@ -13,10 +13,11 @@ public class ConfigureDashboardController {
     public void onConfigConfirm(boolean showTasks,
                                 boolean showStocks,
                                 boolean showWeather,
+                                boolean showSports,
                                 boolean showMap,
                                 boolean showPokemon) {
         ConfigureDashboardRequestModel request = new ConfigureDashboardRequestModel(
-                showTasks, showStocks, showWeather, showMap, showPokemon
+                showTasks, showStocks, showWeather, showSports, showMap, showPokemon
         );
         interactor.configure(request);
     }

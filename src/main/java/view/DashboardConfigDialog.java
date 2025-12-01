@@ -13,6 +13,7 @@ public class DashboardConfigDialog extends JDialog {
     private final JCheckBox stocksBox = new JCheckBox("Stocks");
     private final JCheckBox weatherBox = new JCheckBox("Weather");
     private final JCheckBox sportsBox = new JCheckBox("Sports");
+    private final JCheckBox mapBox = new JCheckBox("Maps");
     private final JCheckBox pokemonBox = new JCheckBox("Pokemon at bottom");
 
     public DashboardConfigDialog(Window owner,
@@ -26,12 +27,14 @@ public class DashboardConfigDialog extends JDialog {
             stocksBox.setSelected(current.isShowStocks());
             weatherBox.setSelected(current.isShowWeather());
             sportsBox.setSelected(current.isShowSports());
+            mapBox.setSelected(current.isShowMaps());
             pokemonBox.setSelected(current.isShowPokemon());
         } else {
             tasksBox.setSelected(true);
             stocksBox.setSelected(true);
             weatherBox.setSelected(true);
             sportsBox.setSelected(true);
+            mapBox.setSelected(true);
             pokemonBox.setSelected(true);
         }
 
@@ -41,6 +44,7 @@ public class DashboardConfigDialog extends JDialog {
         content.add(stocksBox);
         content.add(weatherBox);
         content.add(sportsBox);
+        content.add(mapBox);
         content.add(pokemonBox);
 
         JButton ok = new JButton("OK");
@@ -52,6 +56,7 @@ public class DashboardConfigDialog extends JDialog {
                     stocksBox.isSelected(),
                     weatherBox.isSelected(),
                     sportsBox.isSelected(),
+                    mapBox.isSelected(),
                     pokemonBox.isSelected()
             );
             dispose();

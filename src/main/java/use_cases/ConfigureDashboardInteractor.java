@@ -20,6 +20,7 @@ public class ConfigureDashboardInteractor implements ConfigureDashboardInputBoun
                 requestModel.isShowStocks(),
                 requestModel.isShowWeather(),
                 requestModel.isShowMap(),
+                requestModel.isShowSports(),
                 requestModel.isShowPokemon()
         );
 
