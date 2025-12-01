@@ -21,7 +21,8 @@ public class MainDashboardView extends JPanel implements PropertyChangeListener 
 
     private final DashboardViewModel viewModel;
     private final ConfigureDashboardController controller;
-
+    private final view.ViewManagerModel viewManagerModel;
+    private final JButton logoutButton = new JButton("Logout");
     private final JPanel centerPanel = new JPanel();
     private final JButton configButton = new JButton("⚙ Customize");
 
@@ -32,7 +33,8 @@ public class MainDashboardView extends JPanel implements PropertyChangeListener 
                              JPanel sportsPanel,
                              PokemonPanel pokemonPanel,
                              DashboardViewModel viewModel,
-                             ConfigureDashboardController controller) {
+                             ConfigureDashboardController controller,
+                             view.ViewManagerModel viewManagerModel) {
         this.taskPanel = taskPanel;
         this.stockPanel = stockPanel;
         this.weatherPanel = weatherPanel;
@@ -41,6 +43,7 @@ public class MainDashboardView extends JPanel implements PropertyChangeListener 
         this.pokemonPanel = pokemonPanel;
         this.viewModel = viewModel;
         this.controller = controller;
+        this.viewManagerModel = viewManagerModel;
 
         setLayout(new BorderLayout());
 
@@ -49,7 +52,11 @@ public class MainDashboardView extends JPanel implements PropertyChangeListener 
         rightBox.add(configButton);
         topBar.add(rightBox, BorderLayout.EAST);
         add(topBar, BorderLayout.NORTH);
-
+        rightBox.add(configButton);
+        topBar.add(rightBox, BorderLayout.EAST);
+        JPanel leftBox = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        leftBox.add(logoutButton);
+        topBar.add(leftBox, BorderLayout.WEST);
         add(centerPanel, BorderLayout.CENTER);
 
         viewModel.addPropertyChangeListener(this);
@@ -62,6 +69,11 @@ public class MainDashboardView extends JPanel implements PropertyChangeListener 
         configButton.addActionListener(e -> {
             new DashboardConfigDialog(SwingUtilities.getWindowAncestor(this),
                     viewModel, controller).setVisible(true);
+
+        });
+        logoutButton.addActionListener(e -> {
+            viewManagerModel.setActiveView("log in");
+            viewManagerModel.firePropertyChanged();
         });
     }
 

@@ -3,6 +3,9 @@ package data_access;
 import entity.User;
 import okhttp3.*;
 import org.json.JSONObject;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
 public class UserDataAccessObject {
 
@@ -37,6 +40,24 @@ public class UserDataAccessObject {
         client.newCall(request).execute();
     }
 
+    public boolean checkPassword(String username, String inputPassword) throws Exception {
+        Request request = new Request.Builder()
+                .url(BASE_URL + username + ".json")
+                .get()
+                .build();
+
+        Response response = client.newCall(request).execute();
+        String jsonString = response.body().string();
+
+        if (jsonString.equals("null")) {
+            return false;
+        }
+
+        JSONObject userJson = new JSONObject(jsonString);
+        String storedPassword = userJson.getString("password");
+        return storedPassword.equals(inputPassword);
+    }
+
     // ============================================================
     // LOAD USER
     // ============================================================
@@ -56,7 +77,18 @@ public class UserDataAccessObject {
 
         return new JSONObject(json);
     }
+    public boolean userExists(String username) {
+        try {
+            Request request = new Request.Builder()
+                    .url(BASE_URL + username + ".json")
+                    .get()
+                    .build();
 
-    // make a new method that lets user log in with password and check the user pass word and see if its right
+            Response response = client.newCall(request).execute();
+            String json = response.body().string();
+            return !json.equals("null");
+        } catch (Exception e) {
+            return false;
+        }
+    }
 }
-// make password hasher to mess up the password and unscramble it in thiss progarm.
