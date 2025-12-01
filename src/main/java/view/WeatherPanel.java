@@ -105,7 +105,7 @@ public class WeatherPanel extends JPanel {
                     String description = "-";
                     if (root.has("weather")) {
                         var arr = root.getJSONArray("weather");
-                        if (arr.length() > 0) {
+                        if (!arr.isEmpty()) {
                             description = arr.getJSONObject(0)
                                     .optString("description", "-");
                         }
