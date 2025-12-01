@@ -17,7 +17,7 @@ public class Task {
     private LocalDateTime completedAt;
     private boolean notificationSent;
 
-    private Task(String id, String taskName) {
+    public Task(String id, String taskName) {
         if (id == null || id.isBlank()) {
             throw new IllegalArgumentException("Task id cannot be null or blank");
         }
@@ -31,7 +31,7 @@ public class Task {
         this.priorityOverride = -1;
         this.isComplete = false;
     }
-    private Task(String id, String taskName, Category category) {
+    public Task(String id, String taskName, Category category) {
         this(id, taskName);
         setCategory(category);
     }
@@ -161,17 +161,17 @@ public class Task {
     }
 
     public static class TaskFactory {
-        private static long nextId = 1;
 
+        // 1. Create a NEW task (Generates a random unique ID)
         public static Task createTask(String taskName) {
-            String id = "task-" + nextId;
-            nextId++;
-            return new Task(id, taskName);
+            String uniqueId = java.util.UUID.randomUUID().toString();
+            return new Task(uniqueId, taskName);
         }
-
         public static Task createTask(String taskName, Category category) {
-            String id = "task-" + nextId;
-            nextId++;
+            String uniqueId = java.util.UUID.randomUUID().toString();
+            return new Task(uniqueId, taskName, category);
+        }
+        public static Task reconstituteTask(String id, String taskName, Category category) {
             return new Task(id, taskName, category);
         }
     }
