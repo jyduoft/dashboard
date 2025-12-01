@@ -5,7 +5,16 @@ import org.json.JSONObject;
 
 import javax.swing.*;
 import java.awt.*;
-
+/**
+ * This is weather panel, user can select the city and return the current weather
+ * Currently it can only get the info from the list we provided.
+ * We can update the list to expand the cities this dashboard could visit.
+ * NOTE:
+ * I was considered to use an IP-API to get the user's currently IP, and add a selection of
+ * 'Current Location', but this seems a little tricky and more importantly, it involves some
+ * key questions about privates and ethics. SO I decided not to implement this function now.
+ * But we may implement it in the future
+ */
 public class WeatherPanel extends JPanel {
 
     private final WeatherDataAccessObject weatherDAO;

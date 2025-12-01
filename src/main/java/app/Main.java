@@ -29,6 +29,8 @@ import view.StockPanel;
 import data_access.StockDataAccessObject;
 import data_access.WeatherDataAccessObject;
 import view.WeatherPanel;
+import data_access.NbaGamesDataAccessObject;
+import view.NbaGamesPanel;
 
 import data_access.InMemoryTaskListDataAccessObject;
 import interface_adapter.TaskListController;
@@ -166,8 +168,8 @@ public class Main {
             WeatherDataAccessObject weatherDAO = new WeatherDataAccessObject();
             WeatherPanel weatherPanel = new WeatherPanel(weatherDAO);
 
-            JPanel mapPanel = new JPanel();
-            mapPanel.add(new JLabel("Map panel"));
+            NbaGamesDataAccessObject nbaDAO = new NbaGamesDataAccessObject();
+            NbaGamesPanel mapPanel = new NbaGamesPanel(nbaDAO);
 
 //--------------------------------
 // Pokémon Panel

@@ -9,7 +9,6 @@ import java.awt.*;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
-import java.util.List;
 
 public class MainDashboardView extends JPanel implements PropertyChangeListener {
 
@@ -87,7 +86,7 @@ public class MainDashboardView extends JPanel implements PropertyChangeListener 
         if (config.isShowStocks()) {
             widgets.add(stockPanel);
         }
-        if (config.isShowMap()) {
+        if (config.isShowSports()) {
             widgets.add(mapPanel);
         }
         if (config.isShowWeather()) {
