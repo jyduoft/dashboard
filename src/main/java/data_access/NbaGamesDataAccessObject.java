@@ -5,6 +5,7 @@ import okhttp3.Request;
 import okhttp3.Response;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import use_cases.NbaGamesDataAccessInterface;
 
 /**
  * Data access object for NBA live games.
@@ -13,7 +14,7 @@ import org.json.JSONObject;
  * In the future, you can uncomment the real HTTP call and
  * connect to the balldontlie /box_scores/live endpoint.
  */
-public class NbaGamesDataAccessObject {
+public class NbaGamesDataAccessObject implements NbaGamesDataAccessInterface {
 
     // ---------------For future real API use---------------------
     // NOTE: the code below is my free account's API. It can only visit the past data.
@@ -21,7 +22,7 @@ public class NbaGamesDataAccessObject {
     // private static final OkHttpClient client = new OkHttpClient();
     // private static final String LIVE_URL = "https://api.balldontlie.io/v1/box_scores/live";
     // private static final String API_KEY = "67ad7653-7853-4643-b98c-4cedbf20ade7";
-
+    @Override
     public JSONArray fetchLiveBoxScores() throws Exception {
         // -------------MOCK IMPLEMENTATION---------------
         JSONArray data = new JSONArray();

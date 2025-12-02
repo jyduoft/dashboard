@@ -4,12 +4,13 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 import org.json.JSONObject;
+import use_cases.WeatherDataAccessInterface;
 
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
-public class WeatherDataAccessObject {
+public class WeatherDataAccessObject implements WeatherDataAccessInterface {
 
     private static final OkHttpClient client = new OkHttpClient();
 

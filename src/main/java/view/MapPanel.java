@@ -1,6 +1,6 @@
 package view;
 
-import data_access.MapDataAccessObject;
+import use_cases.MapDataAccessInterface;
 
 import javax.swing.*;
 import java.awt.*;
@@ -15,7 +15,7 @@ import java.awt.*;
  */
 public class MapPanel extends JPanel {
 
-    private final MapDataAccessObject mapDAO;
+    private final MapDataAccessInterface mapDAO;
 
     private final JComboBox<String> cityBox = new JComboBox<>(
             new String[]{
@@ -35,7 +35,7 @@ public class MapPanel extends JPanel {
     private final JLabel mapLabel = new JLabel();  // 显示地图
     private final JLabel statusLabel = new JLabel(" ");
 
-    public MapPanel(MapDataAccessObject mapDAO) {
+    public MapPanel(MapDataAccessInterface mapDAO) {
         this.mapDAO = mapDAO;
 
         setLayout(new BorderLayout(5, 5));

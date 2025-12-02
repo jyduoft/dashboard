@@ -4,8 +4,9 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 import org.json.JSONObject;
+import use_cases.StockDataAccessInterface;
 
-public class StockDataAccessObject {
+public class StockDataAccessObject implements StockDataAccessInterface {
 
     private static final OkHttpClient client = new OkHttpClient();
 

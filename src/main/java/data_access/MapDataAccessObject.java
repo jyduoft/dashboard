@@ -3,6 +3,7 @@ package data_access;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
+import use_cases.MapDataAccessInterface;
 
 import javax.swing.*;
 import java.util.HashMap;
@@ -13,7 +14,7 @@ import java.util.Map;
  * DAO for Geoapify Static Maps API.
  * It returns an ImageIcon that can be shown in a JLabel.
  */
-public class MapDataAccessObject {
+public class MapDataAccessObject implements MapDataAccessInterface {
 
     private static final OkHttpClient client = new OkHttpClient();
 
@@ -35,7 +36,7 @@ public class MapDataAccessObject {
         CITY_COORDS.put("dubai", new double[]{25.2048, 55.2708});
         CITY_COORDS.put("paris", new double[]{48.8566, 2.3522});
     }
-
+    @Override
     public ImageIcon fetchMapForCity(String city) throws Exception {
         if (city == null || city.isEmpty()) {
             throw new IllegalArgumentException("City must not be empty");

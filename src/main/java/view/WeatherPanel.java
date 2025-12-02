@@ -1,7 +1,11 @@
 package view;
 
-import data_access.WeatherDataAccessObject;
 import org.json.JSONObject;
+import use_cases.WeatherDataAccessInterface;
+
+import javax.swing.*;
+import java.awt.*;
+
 
 import javax.swing.*;
 import java.awt.*;
@@ -17,7 +21,7 @@ import java.awt.*;
  */
 public class WeatherPanel extends JPanel {
 
-    private final WeatherDataAccessObject weatherDAO;
+    private final WeatherDataAccessInterface weatherDAO;
 
     // I use the selection box here, we could update more cities if you want.
     // And don't forget to update data access in the WeatherDataAcessObject file.
@@ -33,7 +37,7 @@ public class WeatherPanel extends JPanel {
     private final JLabel humidityLabel = new JLabel("Humidity: -");
     private final JLabel statusLabel = new JLabel(" ");
 
-    public WeatherPanel(WeatherDataAccessObject weatherDAO) {
+    public WeatherPanel(WeatherDataAccessInterface weatherDAO) {
         this.weatherDAO = weatherDAO;
         // Structure:
         // Title: Weather
