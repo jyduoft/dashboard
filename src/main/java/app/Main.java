@@ -133,7 +133,6 @@ public class Main {
             JPanel taskPanel = new TaskListView(taskListController, taskListViewModel, timerController);
             // -------------------------------
 
-
 //--------------------------------
 // Small APP Panel
 // -------------------------------
