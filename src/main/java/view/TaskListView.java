@@ -260,39 +260,12 @@ public class TaskListView extends JPanel implements PropertyChangeListener {
         JLabel nameLabel = new JLabel(labelText);
         nameLabel.setForeground(Color.GRAY);
 
-        // Restore button: move back to active (mark incomplete)
-        JButton restoreButton = new JButton("Restore");
-        restoreButton.setToolTipText("Move back to active tasks");
-        restoreButton.addActionListener(e ->
-                taskController.onToggleComplete(task.getId(), false)
-        );
-
-        // Delete button: remove forever
-        JButton deleteButton = new JButton("Delete");
-        deleteButton.setToolTipText("Delete this task permanently");
-        deleteButton.addActionListener(e -> {
-            int choice = JOptionPane.showConfirmDialog(
-                    this,
-                    "Are you sure you want to permanently delete this task?\n\n" + task.getTaskName(),
-                    "Delete Task",
-                    JOptionPane.YES_NO_OPTION,
-                    JOptionPane.WARNING_MESSAGE
-            );
-            if (choice == JOptionPane.YES_OPTION) {
-                taskController.onDeleteTask(task.getId());
-            }
-        });
-
-        // Optional: still allow editing details (category) if you want
+        // Only a Details button now — actions for completed tasks live in the dialog
         JButton detailsButton = new JButton("Details");
-        detailsButton.setToolTipText("Edit task details");
+        detailsButton.setToolTipText("View and edit task details");
         detailsButton.addActionListener(e -> openDetailsDialog(task));
 
         row.add(nameLabel);
-        row.add(Box.createHorizontalStrut(4));
-        row.add(restoreButton);
-        row.add(Box.createHorizontalStrut(4));
-        row.add(deleteButton);
         row.add(Box.createHorizontalStrut(4));
         row.add(detailsButton);
 
@@ -375,7 +348,7 @@ public class TaskListView extends JPanel implements PropertyChangeListener {
             }
         }
 
-        // Instant apply category changes
+        // Instant-apply category changes
         categoryCombo.addActionListener(e -> {
             Category selected = (Category) categoryCombo.getSelectedItem();
             String name = (selected != null) ? selected.getName() : null;
@@ -385,16 +358,16 @@ public class TaskListView extends JPanel implements PropertyChangeListener {
         dialog.add(categoryCombo, gbc);
         row++;
 
-        // ----- Reset Position button -----
+        // ----- Reset Position (Unpin) button -----
         gbc.gridx = 0;
         gbc.gridy = row;
         gbc.gridwidth = 2;
 
-        JButton resetButton = new JButton("Reset Position");
+        JButton resetButton = new JButton("Reset Position (Unpin)");
         resetButton.addActionListener(e -> {
             taskController.onPinTask(task.getId(), -1);
             JOptionPane.showMessageDialog(dialog,
-                    "Task returned to normal sorting order.",
+                    "Task unpinned and returned to normal sorting.",
                     "Reset Position",
                     JOptionPane.INFORMATION_MESSAGE);
         });
@@ -403,6 +376,48 @@ public class TaskListView extends JPanel implements PropertyChangeListener {
         gbc.gridwidth = 1;
         row++;
 
+        // ----- Extra actions for completed tasks: Restore + Delete -----
+        if (task.isComplete()) {
+            gbc.gridx = 0;
+            gbc.gridy = row;
+            gbc.gridwidth = 2;
+
+            JPanel completedActionsPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+
+            // Restore button: mark task incomplete again
+            JButton restoreButton = new JButton("Restore to Active");
+            restoreButton.setToolTipText("Move this task back to active tasks");
+            restoreButton.addActionListener(e -> {
+                taskController.onToggleComplete(task.getId(), false);
+                dialog.dispose();
+            });
+
+            // Delete button: delete forever
+            JButton deleteButton = new JButton("Delete Task");
+            deleteButton.setToolTipText("Delete this task permanently");
+            deleteButton.addActionListener(e -> {
+                int choice = JOptionPane.showConfirmDialog(
+                        dialog,
+                        "Are you sure you want to permanently delete this task?\n\n" + task.getTaskName(),
+                        "Delete Task",
+                        JOptionPane.YES_NO_OPTION,
+                        JOptionPane.WARNING_MESSAGE
+                );
+                if (choice == JOptionPane.YES_OPTION) {
+                    taskController.onDeleteTask(task.getId());
+                    dialog.dispose();
+                }
+            });
+
+            completedActionsPanel.add(restoreButton);
+            completedActionsPanel.add(deleteButton);
+
+            dialog.add(completedActionsPanel, gbc);
+            gbc.gridwidth = 1;
+            row++;
+        }
+
+        // ----- Close button only -----
         JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         JButton closeButton = new JButton("Close");
         closeButton.addActionListener(e -> dialog.dispose());
