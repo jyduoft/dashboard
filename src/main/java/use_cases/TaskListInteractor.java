@@ -52,7 +52,7 @@ public class TaskListInteractor implements TaskListInputBoundary {
         List<Task> tasks = taskListDataAccessInterface.getAllTasks();
         List<Category> categories = taskListDataAccessInterface.getAllCategories();
 
-        TaskList taskList = new TaskList(tasks, new ArrayList<Task>());
+        TaskList taskList = new TaskList(tasks, new ArrayList<String>());
         Task toPin = taskList.getTaskById(requestModel.getTaskId());
         if (toPin == null) {
             presenter.prepareFailView("Task not found for pinning.");
@@ -71,7 +71,7 @@ public class TaskListInteractor implements TaskListInputBoundary {
         List<Task> tasks = taskListDataAccessInterface.getAllTasks();
         List<Category> categories = taskListDataAccessInterface.getAllCategories();
 
-        TaskList taskList = new TaskList(tasks, new ArrayList<Task>());
+        TaskList taskList = new TaskList(tasks, new ArrayList<String>());
         Task target = taskList.getTaskById(requestModel.getTaskId());
         if (target == null) {
             presenter.prepareFailView("Task not found for completion.");
@@ -86,8 +86,80 @@ public class TaskListInteractor implements TaskListInputBoundary {
     }
 
     @Override
-    public void changeCategory(TaskListChangeCategoryRequestModel requestModel) {
+    public void deleteTask(TaskListDeleteTaskRequestModel requestModel) {
+        List<Task> tasks = taskListDataAccessInterface.getAllTasks();
+        List<Category> categories = taskListDataAccessInterface.getAllCategories();
 
+        String idToDelete = requestModel.getTaskId();
+
+        boolean removed = false;
+        for (int i = 0; i < tasks.size(); i++) {
+            Task t = tasks.get(i);
+            if (t.getId().equals(idToDelete)) {
+                tasks.remove(i);
+                removed = true;
+                break;
+            }
+        }
+
+        if (!removed) {
+            presenter.prepareFailView("Task not found for deletion.");
+            return;
+        }
+
+        taskListDataAccessInterface.saveAllTasks(tasks);
+
+        TaskListResponseModel responseModel = buildResponse(tasks, categories);
+        presenter.prepareSuccessView(responseModel);
+    }
+
+
+    @Override
+    public void changeCategory(TaskListChangeCategoryRequestModel requestModel) {
+        List<Task> tasks = taskListDataAccessInterface.getAllTasks();
+        List<Category> categories = taskListDataAccessInterface.getAllCategories();
+
+        // Find the target task by ID
+        TaskList taskList = new TaskList(tasks, new ArrayList<String>());
+        Task target = taskList.getTaskById(requestModel.getTaskId());
+        if (target == null) {
+            presenter.prepareFailView("Task not found for category change.");
+            return;
+        }
+
+        String rawName = requestModel.getCategoryName();
+        Category newCategory;
+
+        // UNSORTED is the default
+        if (rawName == null || rawName.trim().isEmpty()) {
+            newCategory = Category.UNSORTED;
+        } else {
+            String name = rawName.trim();
+
+            Category existing = null;
+            for (Category c : categories) {
+                if (c.getName().equalsIgnoreCase(name)) {
+                    existing = c;
+                    break;
+                }
+            }
+
+            if (existing != null) {
+                newCategory = existing;
+            } else {
+                // default priority 0
+                newCategory = new Category(name, 0);
+                categories.add(newCategory);
+            }
+        }
+
+        target.setCategory(newCategory);
+
+        taskListDataAccessInterface.saveAllCategories(categories);
+        taskListDataAccessInterface.saveAllTasks(tasks);
+
+        TaskListResponseModel responseModel = buildResponse(tasks, categories);
+        presenter.prepareSuccessView(responseModel);
     }
 
     @Override
@@ -103,7 +175,6 @@ public class TaskListInteractor implements TaskListInputBoundary {
         List<Task> tasks = taskListDataAccessInterface.getAllTasks();
         List<Category> categories = taskListDataAccessInterface.getAllCategories();
 
-        // find existing category by name, or add new
         String name = requestModel.getCategoryName().trim();
         int priority = requestModel.getPriority();
 
@@ -116,7 +187,6 @@ public class TaskListInteractor implements TaskListInputBoundary {
         }
 
         if (existing != null) {
-            // replace with new Category instance with updated priority
             categories.remove(existing);
         }
         categories.add(new Category(name, priority));
@@ -134,16 +204,14 @@ public class TaskListInteractor implements TaskListInputBoundary {
 
         String name = requestModel.getCategoryName().trim();
 
-        // never delete UNSORTED
+        // never delete UNSORTED!!!
         if (Category.UNSORTED.getName().equalsIgnoreCase(name)) {
             presenter.prepareFailView("Cannot delete the UNSORTED category.");
             return;
         }
 
-        // remove category
         categories.removeIf(c -> c.getName().equalsIgnoreCase(name));
 
-        // reassign tasks using that category → UNSORTED
         for (Task t : tasks) {
             if (t.getCategory() != null &&
                     t.getCategory().getName().equalsIgnoreCase(name)) {
@@ -157,7 +225,6 @@ public class TaskListInteractor implements TaskListInputBoundary {
         TaskListResponseModel response = buildResponse(tasks, categories);
         presenter.prepareSuccessView(response);
     }
-
 
     /**
      * Build response with:

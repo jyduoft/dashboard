@@ -1,9 +1,8 @@
 package use_cases;
 
-import entity.Task;
 import entity.Category;
+import entity.Task;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class TaskListResponseModel {
@@ -23,9 +22,12 @@ public class TaskListResponseModel {
     public List<Task> getActiveTasks() {
         return activeTasks;
     }
+
     public List<Task> getCompletedTasks() {
         return completedTasks;
     }
-    public List<Category> getCategories() { return categories; }
-}
 
+    public List<Category> getCategories() {
+        return categories;
+    }
+}

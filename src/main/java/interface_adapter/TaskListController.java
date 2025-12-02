@@ -1,10 +1,6 @@
 package interface_adapter;
 
-import use_cases.TaskListAddTaskRequestModel;
-import use_cases.TaskListChangeCategoryRequestModel;
-import use_cases.TaskListCompleteTaskRequestModel;
-import use_cases.TaskListInputBoundary;
-import use_cases.TaskListPinTaskRequestModel;
+import use_cases.*;
 
 public class TaskListController {
 
@@ -18,6 +14,8 @@ public class TaskListController {
         interactor.viewTaskList();
     }
 
+
+    // Tasks
     public void onAddTask(String taskName) {
         TaskListAddTaskRequestModel request =
                 new TaskListAddTaskRequestModel(taskName, null);
@@ -40,5 +38,29 @@ public class TaskListController {
         TaskListChangeCategoryRequestModel request =
                 new TaskListChangeCategoryRequestModel(taskId, categoryName);
         interactor.changeCategory(request);
+    }
+
+    public void onDeleteTask(String taskId) {
+        TaskListDeleteTaskRequestModel request =
+                new TaskListDeleteTaskRequestModel(taskId);
+        interactor.deleteTask(request);
+    }
+
+
+    // Categories
+    public void onViewCategories() {
+        interactor.viewCategories();
+    }
+
+    public void onAddOrUpdateCategory(String categoryName, int priority) {
+        TaskListAddOrUpdateCategoryRequestModel request =
+                new TaskListAddOrUpdateCategoryRequestModel(categoryName, priority);
+        interactor.addOrUpdateCategory(request);
+    }
+
+    public void onDeleteCategory(String categoryName) {
+        TaskListDeleteCategoryRequestModel request =
+                new TaskListDeleteCategoryRequestModel(categoryName);
+        interactor.deleteCategory(request);
     }
 }
