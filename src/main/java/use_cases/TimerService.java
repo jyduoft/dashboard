@@ -9,40 +9,48 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 public class TimerService {
-    public void startTimer(List<Task> tasks) {
+
+    // CHANGE 1: We hold the DAO, not a List
+    private final TaskDataAccessInterface dataAccess;
+
+    public TimerService(TaskDataAccessInterface dataAccess) {
+        this.dataAccess = dataAccess;
+    }
+
+    public void startTimer() {
         ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
 
-        // Check every 5 seconds
         scheduler.scheduleAtFixedRate(() -> {
-            LocalDateTime now = LocalDateTime.now();
+            // CHANGE 2: Ask for the FRESH list every time the loop runs
+            List<Task> tasks = dataAccess.getAllTasks();
 
-            for (Task task : tasks) {
-                // FIX 1: Method name is 'isComplete()', not 'isCompleted()'
-                if (task.isComplete()) continue;
+            checkTasks(tasks);
+        }, 0, 5, TimeUnit.SECONDS);
+    }
 
-                List<Task.Reminder> reminders = task.getReminders();
-                if (reminders == null || reminders.isEmpty()) {
-                    continue;
-                }
+    // This logic stays the same, just extracted for cleanliness
+    void checkTasks(List<Task> tasks) {
+        LocalDateTime now = LocalDateTime.now();
+        if (tasks == null) return;
 
-                for (Task.Reminder reminder : reminders) {
-                    if (!reminder.isNotificationSent()
-                            && (now.isAfter(reminder.getTime()) || now.isEqual(reminder.getTime()))) {
+        for (Task task : tasks) {
+            if (task.isComplete()) continue;
 
-                        SwingUtilities.invokeLater(() ->
-                                // FIX 4: Method name is 'getTaskName()', not 'getTitle()'
-                                JOptionPane.showMessageDialog(null,
-                                        "⏰ REMINDER: " + task.getTaskName() + " is due soon!")
-                        );
+            List<Task.Reminder> reminders = task.getReminders();
+            if (reminders == null || reminders.isEmpty()) continue;
 
-                        // Mark this specific reminder as sent
-                        reminder.markSent();
+            for (Task.Reminder reminder : reminders) {
+                if (!reminder.isNotificationSent()
+                        && (now.isAfter(reminder.getTime()) || now.isEqual(reminder.getTime()))) {
 
-                        // Break if you only want one popup per task per tick (optional)
-                        break;
-                    }
+                    SwingUtilities.invokeLater(() ->
+                            JOptionPane.showMessageDialog(null,
+                                    "⏰ REMINDER: " + task.getTaskName() + " is due soon!")
+                    );
+                    reminder.markSent();
+                    break;
                 }
             }
-        }, 0, 5, TimeUnit.SECONDS);
+        }
     }
 }
