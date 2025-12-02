@@ -115,8 +115,8 @@ public class Main {
             SetTimerController timerController = new SetTimerController(timerInteractor);
 
             // 3. Start Timer Service (Using the list from Shared DB)
-            TimerService timerService = new TimerService();
-            timerService.startTimer(sharedDAO.getAllTasks());
+            TimerService timerService = new TimerService(sharedDAO);
+            timerService.startTimer();
 
             // 4. Setup Task List (Using the SAME Shared DB)
             TaskListViewModel taskListViewModel = new TaskListViewModel();
