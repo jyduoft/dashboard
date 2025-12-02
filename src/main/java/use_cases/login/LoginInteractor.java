@@ -17,7 +17,8 @@ public class LoginInteractor implements LoginInputBoundary {
     public void executeLogin(String username, String password) {
         try {
             if (userDataAccessObject.checkPassword(username, password)) {
-                loginPresenter.prepareSuccessView(username);
+                loginPresenter.prepareSuccessView(username, password);
+
             } else {
                 loginPresenter.prepareFailView("Incorrect password or user does not exist.");
             }
@@ -44,7 +45,7 @@ public class LoginInteractor implements LoginInputBoundary {
 
             entity.User newUser = new entity.User(username, password);
             userDataAccessObject.createUser(newUser);
-            loginPresenter.prepareSuccessView(username);
+            loginPresenter.prepareSuccessView(username, password);
 
         } catch (Exception e) {
             // This now catches errors from BOTH userExists() and createUser()
