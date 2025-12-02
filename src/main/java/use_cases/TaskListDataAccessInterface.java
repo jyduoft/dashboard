@@ -1,6 +1,7 @@
 package use_cases;
 
 import entity.Task;
+import entity.Category;
 import java.util.List;
 
 /**
@@ -9,4 +10,7 @@ import java.util.List;
 public interface TaskListDataAccessInterface {
     List<Task> getAllTasks();
     void saveAllTasks(List<Task> tasks);
+
+    List<Category> getAllCategories();
+    void saveAllCategories(List<Category> categories);
 }

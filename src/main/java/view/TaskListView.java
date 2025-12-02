@@ -130,6 +130,68 @@ public class TaskListView extends JPanel implements PropertyChangeListener {
         }
     }
 
+    private void openDetailsDialog(Task task) {
+        java.awt.Window parent = SwingUtilities.getWindowAncestor(this);
+        final JDialog dialog = new JDialog(parent, "Task details", Dialog.ModalityType.APPLICATION_MODAL);
+
+        dialog.setLayout(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(4, 4, 4, 4);
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+
+        // Category
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        dialog.add(new JLabel("Category:"), gbc);
+
+        gbc.gridx = 1;
+        JTextField categoryField = new JTextField(15);
+        if (task.getCategory() != null) {
+            categoryField.setText(task.getCategory().getName());
+        }
+        dialog.add(categoryField, gbc);
+
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        dialog.add(new JLabel("Pin index (-1 for none):"), gbc);
+
+        gbc.gridx = 1;
+        JSpinner pinSpinner = new JSpinner(
+                new SpinnerNumberModel(task.getPriorityOverride(), -1, Integer.MAX_VALUE, 1)
+        );
+        dialog.add(pinSpinner, gbc);
+
+        JPanel buttonsPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        JButton saveButton = new JButton("Save");
+        JButton cancelButton = new JButton("Cancel");
+        buttonsPanel.add(saveButton);
+        buttonsPanel.add(cancelButton);
+
+        gbc.gridx = 0;
+        gbc.gridy = 2;
+        gbc.gridwidth = 2;
+        gbc.anchor = GridBagConstraints.EAST;
+        dialog.add(buttonsPanel, gbc);
+
+        saveButton.addActionListener(e -> {
+            String categoryName = categoryField.getText();
+            int pinIndex = (Integer) pinSpinner.getValue();
+
+            // Use your use cases via controller:
+            taskController.onChangeCategory(task.getId(), categoryName);
+            taskController.onPinTask(task.getId(), pinIndex);
+
+            dialog.dispose();
+        });
+
+        cancelButton.addActionListener(e -> dialog.dispose());
+
+        dialog.pack();
+        dialog.setLocationRelativeTo(this);
+        dialog.setVisible(true);
+    }
+
     private JComponent createActiveTaskRow(Task task) {
         JPanel row = new JPanel(new FlowLayout(FlowLayout.LEFT));
         row.setMaximumSize(new Dimension(Integer.MAX_VALUE, 32));
@@ -146,6 +208,10 @@ public class TaskListView extends JPanel implements PropertyChangeListener {
             labelText += " [" + task.getCategory().getName() + "]";
         }
         JLabel nameLabel = new JLabel(labelText);
+
+        JButton detailsButton = new JButton("Details");
+        detailsButton.setToolTipText("Edit task details");
+        detailsButton.addActionListener(e -> openDetailsDialog(task));
 
         JButton timerButton = new JButton("⏱️");
         timerButton.setToolTipText("Set Timer");
@@ -175,6 +241,7 @@ public class TaskListView extends JPanel implements PropertyChangeListener {
         row.add(nameLabel);
         row.add(Box.createHorizontalStrut(8));
         row.add(timerButton);
+        row.add(detailsButton);
 
         return row;
     }
@@ -197,7 +264,7 @@ public class TaskListView extends JPanel implements PropertyChangeListener {
     }
 
     /**
-     * FOR TESTING ONLY IGNORE!!! Generated with gpt
+     * FOR TESTING ONLY. IGNORE!!! Generated with gpt
      */
     public static void main(String[] args) {
 

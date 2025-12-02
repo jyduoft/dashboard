@@ -1,6 +1,7 @@
 package interface_adapter;
 
 import entity.Task;
+import entity.Category;
 
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
@@ -11,12 +12,14 @@ public class TaskListViewModel {
 
     public static final String PROPERTY_ACTIVE = "activeTasks";
     public static final String PROPERTY_COMPLETED = "completedTasks";
+    public static final String PROPERTY_CATEGORIES = "categories";
     public static final String PROPERTY_ERROR = "errorMessage";
 
     private final PropertyChangeSupport support = new PropertyChangeSupport(this);
 
     private List<Task> activeTasks = Collections.emptyList();
     private List<Task> completedTasks = Collections.emptyList();
+    private List<Category> categories = Collections.emptyList();
     private String errorMessage = null;
 
     public void addPropertyChangeListener(PropertyChangeListener listener) {
@@ -49,6 +52,12 @@ public class TaskListViewModel {
 
         support.firePropertyChange(PROPERTY_ACTIVE, oldActive, activeTasks);
         support.firePropertyChange(PROPERTY_COMPLETED, oldCompleted, completedTasks);
+    }
+
+    public void setCategories(List<Category> categories) {
+        List<Category> oldCategories = this.categories;
+        this.categories = categories;
+        support.firePropertyChange(PROPERTY_CATEGORIES, oldCategories, categories);
     }
 
     public void setErrorMessage(String errorMessage) {

@@ -1,6 +1,7 @@
 package interface_adapter;
 
 import use_cases.TaskListAddTaskRequestModel;
+import use_cases.TaskListChangeCategoryRequestModel;
 import use_cases.TaskListCompleteTaskRequestModel;
 import use_cases.TaskListInputBoundary;
 import use_cases.TaskListPinTaskRequestModel;
@@ -33,5 +34,11 @@ public class TaskListController {
         TaskListCompleteTaskRequestModel request =
                 new TaskListCompleteTaskRequestModel(taskId, complete);
         interactor.completeTask(request);
+    }
+
+    public void onChangeCategory(String taskId, String categoryName) {
+        TaskListChangeCategoryRequestModel request =
+                new TaskListChangeCategoryRequestModel(taskId, categoryName);
+        interactor.changeCategory(request);
     }
 }
