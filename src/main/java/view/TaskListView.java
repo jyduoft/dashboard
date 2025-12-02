@@ -180,7 +180,7 @@ public class TaskListView extends JPanel implements PropertyChangeListener {
             if (input != null && !input.isEmpty()) {
                 try {
                     long mins = Long.parseLong(input.trim());
-                    timerController.execute(task.getTaskName(), mins, 0);
+                    timerController.execute(task.getId(), mins, 0);
                 } catch (NumberFormatException ex) {
                     JOptionPane.showMessageDialog(
                             this,
