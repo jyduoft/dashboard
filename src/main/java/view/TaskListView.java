@@ -363,7 +363,7 @@ public class TaskListView extends JPanel implements PropertyChangeListener {
         gbc.gridy = row;
         gbc.gridwidth = 2;
 
-        JButton resetButton = new JButton("Reset Position (Unpin)");
+        JButton resetButton = new JButton("Reset Position");
         resetButton.addActionListener(e -> {
             taskController.onPinTask(task.getId(), -1);
             JOptionPane.showMessageDialog(dialog,
@@ -572,6 +572,17 @@ public class TaskListView extends JPanel implements PropertyChangeListener {
                 return;
             }
 
+            // Don't even call the use case for UNSORTED; show dialog instead
+            if (Category.UNSORTED.getName().equalsIgnoreCase(selected.getName())) {
+                JOptionPane.showMessageDialog(
+                        dialog,
+                        "You can't delete the UNSORTED category.",
+                        "Protected Category",
+                        JOptionPane.INFORMATION_MESSAGE
+                );
+                return;
+            }
+
             taskController.onDeleteCategory(selected.getName());
             taskController.onViewCategories();
             reloadCategories.run();
@@ -579,6 +590,7 @@ public class TaskListView extends JPanel implements PropertyChangeListener {
             nameField.setText("");
             prioritySpinner.setValue(0);
         });
+
 
         // close button
         JButton closeButton = new JButton("Close");

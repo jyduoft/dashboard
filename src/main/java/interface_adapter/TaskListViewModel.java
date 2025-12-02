@@ -48,22 +48,19 @@ public class TaskListViewModel {
 
     // Tasks
     public void setTasks(List<Task> activeTasks, List<Task> completedTasks) {
-        List<Task> oldActive = this.activeTasks;
-        List<Task> oldCompleted = this.completedTasks;
-
         this.activeTasks = activeTasks;
         this.completedTasks = completedTasks;
         this.errorMessage = null;
 
-        support.firePropertyChange(PROPERTY_ACTIVE, oldActive, activeTasks);
-        support.firePropertyChange(PROPERTY_COMPLETED, oldCompleted, completedTasks);
+        // Force notifications even if contents are "equal"
+        support.firePropertyChange(PROPERTY_ACTIVE, null, activeTasks);
+        support.firePropertyChange(PROPERTY_COMPLETED, null, completedTasks);
     }
 
     // Categories
     public void setCategories(List<Category> categories) {
-        List<Category> oldCategories = this.categories;
         this.categories = categories;
-        support.firePropertyChange(PROPERTY_CATEGORIES, oldCategories, categories);
+        support.firePropertyChange(PROPERTY_CATEGORIES, null, categories);
     }
 
     // Error - used by both
