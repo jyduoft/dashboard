@@ -9,13 +9,13 @@ import java.awt.*;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
-import java.util.List;
 
 public class MainDashboardView extends JPanel implements PropertyChangeListener {
 
     private final JPanel taskPanel;
     private final JPanel stockPanel;
     private final JPanel weatherPanel;
+    private final JPanel sportsPanel;
     private final JPanel mapPanel;
     private final PokemonPanel pokemonPanel;
 
@@ -30,6 +30,7 @@ public class MainDashboardView extends JPanel implements PropertyChangeListener 
                              JPanel stockPanel,
                              JPanel weatherPanel,
                              JPanel mapPanel,
+                             JPanel sportsPanel,
                              PokemonPanel pokemonPanel,
                              DashboardViewModel viewModel,
                              ConfigureDashboardController controller,
@@ -37,6 +38,7 @@ public class MainDashboardView extends JPanel implements PropertyChangeListener 
         this.taskPanel = taskPanel;
         this.stockPanel = stockPanel;
         this.weatherPanel = weatherPanel;
+        this.sportsPanel = sportsPanel;
         this.mapPanel = mapPanel;
         this.pokemonPanel = pokemonPanel;
         this.viewModel = viewModel;
@@ -96,15 +98,10 @@ public class MainDashboardView extends JPanel implements PropertyChangeListener 
 
         // Components Panel: set at right with 4*4 blocks
         java.util.List<JPanel> widgets = new ArrayList<>();
-        if (config.isShowStocks()) {
-            widgets.add(stockPanel);
-        }
-        if (config.isShowMap()) {
-            widgets.add(mapPanel);
-        }
-        if (config.isShowWeather()) {
-            widgets.add(weatherPanel);
-        }
+        if (config.isShowStocks()) {widgets.add(stockPanel);}
+        if (config.isShowMaps()) {widgets.add(mapPanel);}
+        if (config.isShowSports()) {widgets.add(sportsPanel);}
+        if (config.isShowWeather()) {widgets.add(weatherPanel);}
 
         if (widgets.isEmpty()) {
             centerPanel.setLayout(new BorderLayout());

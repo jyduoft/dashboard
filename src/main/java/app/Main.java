@@ -29,6 +29,10 @@ import view.StockPanel;
 import data_access.StockDataAccessObject;
 import data_access.WeatherDataAccessObject;
 import view.WeatherPanel;
+import data_access.NbaGamesDataAccessObject;
+import view.NbaGamesPanel;
+import data_access.MapDataAccessObject;
+import view.MapPanel;
 import view.ViewManager;
 import view.ViewManagerModel;
 import view.LoginView;
@@ -78,7 +82,8 @@ public class Main {
             // #################################################################################
             DashboardConfigDataAccessInterface gateway = new DashboardConfigDataAccessInterface() {
                 private DashboardConfig config =
-                        new DashboardConfig(true, true, true, true, true);
+                        new DashboardConfig(true, true, true,
+                                true, true, true);
 
                 @Override
                 public void save(DashboardConfig c) {
@@ -138,8 +143,12 @@ public class Main {
             WeatherDataAccessObject weatherDAO = new WeatherDataAccessObject();
             WeatherPanel weatherPanel = new WeatherPanel(weatherDAO);
 
-            JPanel mapPanel = new JPanel();
-            mapPanel.add(new JLabel("Map panel"));
+            NbaGamesDataAccessObject nbaDAO = new NbaGamesDataAccessObject();
+            NbaGamesPanel sportsPanel = new NbaGamesPanel(nbaDAO);
+
+            MapDataAccessObject mapDAO = new MapDataAccessObject();
+            MapPanel mapPanel = new MapPanel(mapDAO);
+
 
 //--------------------------------
 // Pokémon Panel
@@ -220,6 +229,7 @@ public class Main {
                     taskPanel,
                     stockPanel,
                     weatherPanel,
+                    sportsPanel,
                     mapPanel,
                     pokemonPanel,
                     viewModel, controller,

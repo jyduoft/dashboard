@@ -6,24 +6,24 @@ public class DashboardConfig {
     private final boolean showTasks;
     private final boolean showStocks;
     private final boolean showWeather;
-    private final boolean showMap;
+    private final boolean showSports;
+    private final boolean showMaps;
     private final boolean showPokemon;
 
     public DashboardConfig(boolean showTasks, boolean showStocks,
-                           boolean showWeather, boolean showMap,
-                           boolean showPokemon) {
+                           boolean showWeather, boolean showSports,
+                           boolean showMaps, boolean showPokemon) {
         this.showTasks = showTasks;
-        // this.showTasks = true;
-
         this.showStocks = showStocks;
         this.showWeather = showWeather;
-        this.showMap = showMap;
+        this.showSports = showSports;
+        this.showMaps = showMaps;
         this.showPokemon = showPokemon;
     }
-    // Keep Task always show in the dashboard?
     public boolean isShowTasks() { return showTasks; }
     public boolean isShowStocks() { return showStocks; }
     public boolean isShowWeather() { return showWeather; }
-    public boolean isShowMap() { return showMap; }
+    public boolean isShowSports() { return showSports; }
+    public boolean isShowMaps() { return showMaps; }
     public boolean isShowPokemon() { return showPokemon; }
 }
