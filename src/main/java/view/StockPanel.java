@@ -2,6 +2,7 @@ package view;
 
 import data_access.StockDataAccessObject;
 import org.json.JSONObject;
+import use_cases.StockDataAccessInterface;
 
 import javax.swing.*;
 import java.awt.*;
@@ -22,7 +23,7 @@ import java.awt.*;
  */
 public class StockPanel extends JPanel {
 
-    private final StockDataAccessObject stockDAO;
+    private final StockDataAccessInterface stockDAO;
 
     private final JTextField symbolField = new JTextField(8);
     private final JButton loadButton = new JButton("Load");

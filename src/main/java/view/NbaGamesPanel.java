@@ -1,8 +1,8 @@
 package view;
 
-import data_access.NbaGamesDataAccessObject;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import use_cases.NbaGamesDataAccessInterface;
 
 import javax.swing.*;
 import java.awt.*;
@@ -19,7 +19,7 @@ import java.awt.*;
 
 public class NbaGamesPanel extends JPanel {
 
-    private final NbaGamesDataAccessObject nbaDAO;
+    private final NbaGamesDataAccessInterface nbaDAO;
 
     private final JButton refreshButton = new JButton("Refresh");
     private final JTextArea gamesArea = new JTextArea(8, 24);
@@ -27,7 +27,7 @@ public class NbaGamesPanel extends JPanel {
 
     private final Timer autoRefreshTimer;
 
-    public NbaGamesPanel(NbaGamesDataAccessObject nbaDAO) {
+    public NbaGamesPanel(NbaGamesDataAccessInterface nbaDAO) {
         this.nbaDAO = nbaDAO;
 
         setLayout(new BorderLayout(5, 5));
