@@ -17,6 +17,8 @@ public class TaskListPresenter implements TaskListOutputBoundary {
                 responseModel.getActiveTasks(),
                 responseModel.getCompletedTasks()
         );
+
+        viewModel.setCategories(responseModel.getCategories());
     }
 
     @Override
