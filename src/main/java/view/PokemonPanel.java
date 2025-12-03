@@ -5,7 +5,7 @@ import java.awt.*;
 
 public class PokemonPanel extends JPanel {
 
-    private final ImageIcon icon;
+    private ImageIcon icon;
     private int x = 0;
     private int dx = 3;
 
@@ -19,6 +19,15 @@ public class PokemonPanel extends JPanel {
         timer.start();
 
         setPreferredSize(new Dimension(200, 60));
+    }
+
+    public void updateIcon(ImageIcon newIcon) {
+        if (newIcon != null) {
+            this.icon = newIcon;
+            // Reset position when changing sprite
+            x = 0;
+            repaint();
+        }
     }
 
     private void move() {

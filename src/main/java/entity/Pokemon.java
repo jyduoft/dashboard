@@ -88,4 +88,8 @@ public class Pokemon {
     public int  getId() {
         return id;
     }
+
+    public void setImgFilePath(String imgFilePath) {
+        this.imgFilePath = imgFilePath;
+    }
 }
