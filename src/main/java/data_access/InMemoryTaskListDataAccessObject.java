@@ -3,28 +3,17 @@ package data_access;
 import use_cases.TaskDataAccessInterface;
 import use_cases.TaskListDataAccessInterface;
 import entity.Task;
-import entity.Category;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Shared In-Memory Database for both Task List and Timer.
- * Also stores categories
  */
 public class InMemoryTaskListDataAccessObject implements TaskListDataAccessInterface, TaskDataAccessInterface {
 
     private final List<Task> tasks = new ArrayList<>();
-    private final List<Category> categories = new ArrayList<>();
 
-    public InMemoryTaskListDataAccessObject() {
-        // Ensure UNSORTED category always exists
-        categories.add(Category.UNSORTED);
-    }
-
-    // ====================
-    // Task stuff
-    // ====================
     @Override
     public List<Task> getAllTasks() {
         return new ArrayList<>(tasks);
@@ -55,35 +44,5 @@ public class InMemoryTaskListDataAccessObject implements TaskListDataAccessInter
             }
         }
         tasks.add(task);
-    }
-
-    // ====================
-    // Category stuff
-    // ====================
-    @Override
-    public List<Category> getAllCategories() {
-        return new ArrayList<>(categories);
-    }
-
-    @Override
-    public void saveAllCategories(List<Category> newCategories) {
-        categories.clear();
-
-        // Always ensure UNSORTED exists
-        categories.add(Category.UNSORTED);
-
-        if (newCategories == null) {
-            return;
-        }
-
-        // Avoid duplicating UNSORTED and preserve other categories
-        for (Category c : newCategories) {
-            if (c == null) continue;
-            // skip if same as UNSORTED by name (or by reference)
-            if (Category.UNSORTED.getName().equalsIgnoreCase(c.getName())) {
-                continue;
-            }
-            categories.add(c);
-        }
     }
 }
