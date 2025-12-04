@@ -8,6 +8,9 @@ import use_cases.PokemonManager;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 
 public class PokemonDataAccessObject {
@@ -20,12 +23,36 @@ public class PokemonDataAccessObject {
     private final OkHttpClient client = new OkHttpClient();
 
     // ============================================================
+    // PASSWORD HASHING (SHA-256)
+    // ============================================================
+    private String hashPassword(String password) {
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            byte[] hashBytes = digest.digest(password.getBytes(StandardCharsets.UTF_8));
+            
+            // Convert bytes to hexadecimal string
+            StringBuilder hexString = new StringBuilder();
+            for (byte b : hashBytes) {
+                String hex = Integer.toHexString(0xff & b);
+                if (hex.length() == 1) {
+                    hexString.append('0');
+                }
+                hexString.append(hex);
+            }
+            return hexString.toString();
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException("SHA-256 algorithm not available", e);
+        }
+    }
+
+    // ============================================================
     // SAVE USER + POKEMON DATA TO FIREBASE
     // ============================================================
     public void saveUserData(User user, PokemonManager manager) throws Exception {
 
         JSONObject json = new JSONObject();
-        json.put("password", user.getPassword());   // you can remove if you don't want
+        // Store the HASHED password, not plain text
+        json.put("password", hashPassword(user.getPassword()));
         json.put("info", manager.toJson());         // your full pokemon data
 
         RequestBody body = RequestBody.create(json.toString(), JSON_MEDIA);

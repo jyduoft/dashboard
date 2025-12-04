@@ -17,16 +17,41 @@ public class UserDataAccessObject {
     private final OkHttpClient client = new OkHttpClient();
 
     // ============================================================
-    // CREATE USER (just write to Firebase)
+    // PASSWORD HASHING (SHA-256)
+    // ============================================================
+    private String hashPassword(String password) {
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            byte[] hashBytes = digest.digest(password.getBytes(StandardCharsets.UTF_8));
+            
+            // Convert bytes to hexadecimal string
+            StringBuilder hexString = new StringBuilder();
+            for (byte b : hashBytes) {
+                String hex = Integer.toHexString(0xff & b);
+                if (hex.length() == 1) {
+                    hexString.append('0');
+                }
+                hexString.append(hex);
+            }
+            return hexString.toString();
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException("SHA-256 algorithm not available", e);
+        }
+    }
+
+    // ============================================================
+    // CREATE USER (with hashed password)
     // ============================================================
     public void createUser(User user) throws Exception {
 
         JSONObject base = new JSONObject();
-        base.put("password", user.getPassword());
+        // Store the HASHED password, not the plain text
+        base.put("password", hashPassword(user.getPassword()));
 
         JSONObject info = new JSONObject();
         info.put("pokemons", new org.json.JSONArray());
         info.put("currentPokemonId", -1);
+        info.put("coins", 100); // Give new users 100 starting coins
 
         base.put("info", info);
 
@@ -40,6 +65,9 @@ public class UserDataAccessObject {
         client.newCall(request).execute();
     }
 
+    // ============================================================
+    // CHECK PASSWORD (compares hashed values)
+    // ============================================================
     public boolean checkPassword(String username, String inputPassword) throws Exception {
         Request request = new Request.Builder()
                 .url(BASE_URL + username + ".json")
@@ -54,8 +82,11 @@ public class UserDataAccessObject {
         }
 
         JSONObject userJson = new JSONObject(jsonString);
-        String storedPassword = userJson.getString("password");
-        return storedPassword.equals(inputPassword);
+        String storedHashedPassword = userJson.getString("password");
+        
+        // Hash the input password and compare with stored hash
+        String inputHashedPassword = hashPassword(inputPassword);
+        return storedHashedPassword.equals(inputHashedPassword);
     }
 
     // ============================================================
