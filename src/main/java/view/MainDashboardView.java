@@ -58,6 +58,7 @@ public class MainDashboardView extends JPanel implements PropertyChangeListener 
 
         JPanel topBar = new JPanel(new BorderLayout());
         JPanel rightBox = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        rightBox.add(configButton);
         rightBox.add(pokemonShopButton);
         rightBox.add(pokemonInventoryButton);
         rightBox.add(configButton);
